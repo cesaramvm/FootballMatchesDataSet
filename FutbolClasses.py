@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-__author__ = 'RicardoMoya'
+#Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 
 import time
 import datetime
@@ -17,6 +16,8 @@ class Equipo:
 class Partido:
     def __init__(self, id_partido, temporada, division, jornada, local,
                  visitante, goles_local, goles_visitante, fecha):
+        print("GUARDO PARTIDO",id_partido, "temp", temporada, "div", division, "jor", jornada)
+        print("local", local, "visitante", visitante, "golesLoc", goles_local, "golesVis", goles_visitante)
         self.idPartido = id_partido
         self.temporada = temporada
         self.division = division

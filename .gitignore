@@ -1,7 +1,8 @@
 #########################
 ### Proyectos en java ###
 #########################
-
+venv/
+venv/**
 # Eclipse
 .classpath
 .project

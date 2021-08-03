@@ -1,97 +1,101 @@
-# -*- coding: utf-8 -*-
-__author__ = 'RicardoMoya'
+#Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
+import json
 
 from bs4 import BeautifulSoup
-from FutbolClass import Partido
+from FutbolClasses import Partido
 import requests
 import re
 import unicodedata
 import Const
+import time
 
 # En este fichero voy a obtener un historico de partidos de futbol de todas
 # las temporadas anteriores a la actual a partir de la web:
 # http://www.bdfutbol.com/
-
 # Guardo los partidos de futbol con un id
 partidos = dict()
 
 # Guardo los equipos de futbol con su id y su nombre
-equipos = dict()
+idToEquipoDict = dict()
+equipoToIdDict = dict()
+equipoCount = 0
 
 # Contador de Partidos
 contador = 0
 
 
+def getInfo():
+    return scrape1y2()
+
+# Devuelvo un diccionario con todos los partidos de
+# futbol de todas las temporadas
+def scrape1y2():
+    # Genero las URLS y scrapeo los datos
+    for season in Const.TEMPORADAS:
+        print("****  PROCESANDO TEMPORADA %s ****" % season)
+        # Construyo las URLs
+        scrapeLeague(Const.URL_PRIMERA, season)
+        scrapeLeague(Const.URL_PRIMERA, season)
+
+
+    return partidos
+
+def scrapeLeague(leagueUrlConst, season):
+    url = leagueUrlConst % season
+    req = requests.get(url)
+    soupReq = BeautifulSoup(req.text, "html.parser")
+    seasonData = str(soupReq.find('div', {'id': 'resultats'}))
+    findEquipos(seasonData)
+    findPartidos(seasonData, season, 1)
+
 # Funcion para sustituir el nombre de los equipos y unificarlos
-def replace_equipos(equipo):
+def replaceEquipos(equipo):
     equipo = equipo.replace('Deportivo de La Coruña', 'Deportivo')
     equipo = equipo.replace('Barcelona Atletic', 'Barcelona B')
-    # Elimino las tildes
-    equipo = unicodedata.normalize('NFKD', equipo.decode('utf-8')).encode('ASCII', 'ignore')
-
     return equipo
 
 
 # Inserto los equipos nuevos en el diccionario
-def find_equipos(str_resultados):
+def findEquipos(str_resultados):
+    global equipoCount
     match = re.findall(r'SE\[\d{0,100}\]=\".*?\";', str_resultados)
     for mat in match:
         mat = re.sub(r'SE.*?="', '', mat)
         mat = mat.replace('";', '')
         sp = mat.split('|')
+        #Todo guardar en un diccionario temporal
+        currentEquipoId = sp[0]
+        equipo = sp[1]
 
-        if not sp[0] in equipos:
-            equipos[sp[0]] = sp[1]
+        if not equipo in equipoToIdDict:
+            idToEquipoDict[equipoCount] = equipo
+            equipoToIdDict[equipo] = equipoCount
+            equipoCount = equipoCount + 1
 
 
 # Obtengo una lista con los partidos de futbol de una temporada
-def find_partidos(str_partidos, temporada, division):
+def findPartidos(str_partidos, temporada, division):
     global contador
 
-    match = re.findall(r'SP\[\d{0,100}\]\[\d{0,100}\]=\".*?\";', str_partidos)
-    for mat in match:
-        jornada = re.findall(r'SP\[.*?]', mat)
-        jornada = jornada[0].replace('SP[', '').replace(']', '')
-        mat = re.sub(r'SP.*?="', '', mat).replace('";', '')
-        sp = mat.split(' ')
+    matches = re.findall(r'SP\[\d{0,100}\]\[\d{0,100}\]=\".*?\";', str_partidos)
+    matches = re.findall(r'SP\[\d{0,100}\].push\(.*\);', str_partidos)
+    for matchData in matches:
+        jornada = re.findall(r'SP\[.*?]', matchData)[0].replace('SP[', '').replace(']', '')
+        jsonInfo = json.loads(re.findall(r'\{.*\}', matchData)[0])
+        dia = jsonInfo.get("d")
+        eq1Id = int(jsonInfo.get("a1"))
+        eq2Id = int(jsonInfo.get("a2"))
+        score1 = int(jsonInfo.get("g1"))
+        score2 = int(jsonInfo.get("g2"))
         contador += 1
-        partidos[contador] = Partido(contador, temporada, division, jornada, replace_equipos(equipos[sp[1]]),
-                                     replace_equipos(equipos[sp[2]]), sp[3], sp[4], sp[0])
+        local = replaceEquipos(idToEquipoDict[eq1Id])
+        visitante = replaceEquipos(idToEquipoDict[eq2Id])
+        partidos[contador] = Partido(contador, temporada, division, jornada, local,
+                                     visitante, score1, score2, dia)
 
     return partidos
 
 
-# Devuelvo un diccionario con todos los partidos de
-# futbol de todas las temporadas
-def get_partidos():
-    # Genero las URLS y scrapeo los datos
-    for url in Const.TEMPORADAS:
-        print "****  PROCESANDO TEMPORADA %s ****" % url
-        # Construyo las URLs
-        url_primera = Const.URL_PRIMERA % url
-        url_segunda = Const.URL_SEGUNDA % url
-
-        # Realizo las peticiones a las URLs
-        req_primera = requests.get(url_primera)
-        req_segunda = requests.get(url_segunda)
-
-        # Paso la request a un objeto BeautifulSoup
-        soup_primera = BeautifulSoup(req_primera.text, "html.parser")
-        soup_segunda = BeautifulSoup(req_segunda.text, "html.parser")
-
-        # Obtengo el div donde estan los datos
-        datos_primera = str(soup_primera.find('div', {'id': 'resultats'}))
-        datos_segunda = str(soup_segunda.find('div', {'id': 'resultats'}))
-
-        # Obtengo equipos de futbol
-        find_equipos(datos_primera)
-        find_equipos(datos_segunda)
-
-        # Obtengo los partidos de futbol
-        find_partidos(datos_primera, url, 1)
-        find_partidos(datos_segunda, url, 2)
-
-    return partidos
 
 
 # Devuelvo el valor del contador
