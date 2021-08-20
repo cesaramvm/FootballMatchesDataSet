@@ -3,6 +3,11 @@
 import time
 import datetime
 
+class Temporada:
+    def __init__(self, año):
+        self.año = año
+        self.teams = []
+        self.jornadas = []
 
 class Equipo:
     def __init__(self, id_club, nombre):

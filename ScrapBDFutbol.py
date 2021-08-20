@@ -5,15 +5,15 @@ from bs4 import BeautifulSoup
 from FutbolClasses import Partido
 import requests
 import re
-import unicodedata
 import Const
 import time
 
-# En este fichero voy a obtener un historico de partidos de futbol de todas
-# las temporadas anteriores a la actual a partir de la web:
-# http://www.bdfutbol.com/
+
+temporada = dict()
+
 # Guardo los partidos de futbol con un id
 partidos = dict()
+
 
 # Guardo los equipos de futbol con su id y su nombre
 idToEquipoDict = dict()
@@ -34,13 +34,16 @@ def scrape1y2():
     for season in Const.TEMPORADAS:
         print("****  PROCESANDO TEMPORADA %s ****" % season)
         # Construyo las URLs
-        scrapeLeague(Const.URL_PRIMERA, season)
-        scrapeLeague(Const.URL_PRIMERA, season)
+        resultScrapePrimera = scrapeLeague(Const.URL_PRIMERA, season, temporada[season]["1"])
+        temporada[season] = {"1":resultScrapePrimera}
+
+        resultScrapeSegunda = scrapeLeague(Const.URL_SEGUNDA, season, temporada[season]["1"])
+        temporada[season] = {"2": resultScrapeSegunda}
 
 
     return partidos
 
-def scrapeLeague(leagueUrlConst, season):
+def scrapeLeague(leagueUrlConst, season, saveData):
     url = leagueUrlConst % season
     req = requests.get(url)
     soupReq = BeautifulSoup(req.text, "html.parser")
