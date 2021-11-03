@@ -10,19 +10,20 @@ class Temporada:
         self.jornadas = []
 
 class Equipo:
-    def __init__(self, id_club, nombre):
+    def __init__(self, id_club, nombre, valor):
         self.id_club = id_club
         self.nombre = nombre
+        self.valorActual = valor
 
     def __str__(self):
-        return "%s - %s" % (self.id_club, self.nombre)
+        return "%s - %s - %s" % (self.id_club, self.nombre, self.valorActual)
 
 
 class Partido:
     def __init__(self, id_partido, temporada, division, jornada, local,
                  visitante, goles_local, goles_visitante, fecha):
-        print("GUARDO PARTIDO",id_partido, "temp", temporada, "div", division, "jor", jornada)
-        print("local", local, "visitante", visitante, "golesLoc", goles_local, "golesVis", goles_visitante)
+        # print("GUARDO PARTIDO",id_partido, "temp", temporada, "div", division, "jor", jornada)
+        # print("local", local, "visitante", visitante, "golesLoc", goles_local, "golesVis", goles_visitante)
         self.idPartido = id_partido
         self.temporada = temporada
         self.division = division
