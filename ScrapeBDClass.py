@@ -1,5 +1,4 @@
 import sys
-
 import Const
 from bs4 import BeautifulSoup
 import requests, re, json
@@ -35,7 +34,7 @@ class ScrapeBDFutbol:
     def saveInfo(self, fileName):
         fichero = open(fileName, 'w')
         fichero.write('idPartido::temporada::division::jornada::EquipoLocal::'
-                      'EquipoVisitante::golesLocal::golesVisitante::fecha::timestamp\n')
+                      'EquipoVisitante::golesLocal::golesVisitante::fecha\n')
         for value in self.partidos.values():
             fichero.write('%s\n' % str(value))
 

@@ -3,14 +3,16 @@
 from ScrapeBDClass import ScrapeBDFutbol
 
 scrapeBD = ScrapeBDFutbol()
-scrapeBD.startScrape()
-scrapeBD.saveInfo('DataSetPartidos.txt')
+# scrapeBD.startScrape()
+# scrapeBD.saveInfo('DataSetPartidos.txt')
+
+scrapeBD.loadScrape('DataSetPartidos.1.txt')
 
 #
 # from ScrapBDFutbol import *
 # # Obtengo los partidos de futbol de las temporadas anteriores
 # partidos = getInfo()
-# fichero = open('DataSetPartidos.txt', 'w')
+# fichero = open('DataSetPartidos.all.txt', 'w')
 # fichero.write('idPartido::temporada::division::jornada::EquipoLocal::'
 #               'EquipoVisitante::golesLocal::golesVisitante::fecha::timestamp\n')
 # for value in partidos.values():
