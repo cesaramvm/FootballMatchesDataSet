@@ -1,12 +1,11 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 
-from ScrapeBDClass import ScrapeBDFutbol
+from FootballScraper import *
 
-scrapeBD = ScrapeBDFutbol()
-# scrapeBD.startScrape()
-# scrapeBD.saveInfo('DataSetPartidos.txt')
+startScrape()
+saveInfo('DataSetPartidos.txt')
 
-scrapeBD.loadScrape('DataSetPartidos.1.txt')
+# scrapeBD.loadScrape('DataSetPartidos.1.txt')
 
 #
 # from ScrapBDFutbol import *

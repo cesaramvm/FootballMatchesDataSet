@@ -20,7 +20,7 @@ class Equipo:
 
 
 class Partido:
-    def __init__(self, id_partido, temporada, division, jornada, local,
+    def __init__(self, id_partido, division,temporada,  jornada, local,
                  visitante, goles_local, goles_visitante, fecha):
         self.idPartido = id_partido
         self.temporada = temporada
