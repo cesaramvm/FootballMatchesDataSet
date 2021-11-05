@@ -12,13 +12,13 @@ class DatosTemporada:
         for equipoId in seasonIdToTeam.keys():
             self.clasificacion[equipoId] = 0
 
-    def addMatch(self, jornada, dia, idLocal, idVisitante, golesLocal, golesVisitante):
+    def addMatch(self, jornada, fecha, idLocal, idVisitante, golesLocal, golesVisitante):
         global CURRENT_MATCH_ID
 
         if jornada not in self.jornadas:
             self.jornadas[jornada] = dict()
-        partidonuevo = Partido(CURRENT_MATCH_ID, self.division, self.temporada, jornada,
-                               idLocal, idVisitante, golesLocal, golesVisitante, dia)
+        partidonuevo = Partido(CURRENT_MATCH_ID, self.division, self.temporada, jornada, fecha,
+                               idLocal, idVisitante, golesLocal, golesVisitante, self.clasificacion[idLocal], self.clasificacion[idVisitante])
         self.jornadas[jornada][CURRENT_MATCH_ID] = partidonuevo
 
         self.updateClasification(idLocal,idVisitante, golesLocal, golesVisitante)

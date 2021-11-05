@@ -55,11 +55,11 @@ def fillSeason(division, temporada, str_partidos, seasonIdToTeam):
     for matchData in matches:
         jornada = re.findall(r'SP\[.*?]', matchData)[0].replace('SP[', '').replace(']', '')
         jsonInfo = json.loads(re.findall(r'\{.*\}', matchData)[0])
-        dia = jsonInfo.get("d")
+        fecha = jsonInfo.get("d")
         localId = int(jsonInfo.get("a1"))
         visitanteId = int(jsonInfo.get("a2"))
         golesLocal = int(jsonInfo.get("g1"))
         golesVisitante = int(jsonInfo.get("g2"))
-        datosTemporada.addMatch(jornada, dia, localId, visitanteId, golesLocal, golesVisitante)
+        datosTemporada.addMatch(jornada, fecha, localId, visitanteId, golesLocal, golesVisitante)
 
     return datosTemporada
