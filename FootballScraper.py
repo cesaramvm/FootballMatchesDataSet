@@ -17,8 +17,9 @@ def scrapeLeague(division, temporada):
     req = requests.get(url)
     soupReq = BeautifulSoup(req.text, "html.parser")
     seasonData = str(soupReq.find('div', {'id': 'resultats'}))
-    seasonIdToTeam = findEquipos(seasonData)
-    datosTemporada = fillSeason(division, temporada, seasonData, seasonIdToTeam)
+    seasonIdToGlobalId = findEquipos(seasonData)
+    datosTemporada = DatosTemporada(division, temporada, seasonIdToGlobalId)
+    fillSeason(datosTemporada, seasonData)
     ADD_SEASON_INFO(division, temporada, datosTemporada)
 
 
@@ -26,9 +27,8 @@ def saveInfo(fileName):
     SAVE_ALL_SEASONS(fileName)
 
 
-# Inserto los equipos nuevos en el diccionario
 def findEquipos(str_resultados):
-    seasonIdToTeam = dict()
+    seasonIdToGlobalId = dict()
     match = re.findall(r'SE\[\d{0,100}\]=\".*?\";', str_resultados)
     for mat in match:
         mat = re.sub(r'SE.*?="', '', mat)
@@ -36,20 +36,21 @@ def findEquipos(str_resultados):
         sp = mat.split('|')
         currentEquipoId = int(sp[0])
         equipoName = CHECK_EQUIPO_NAME(sp[1])
-        seasonIdToTeam[currentEquipoId] = equipoName
 
         if not equipoName in ALL_TEAMS_TO_ID:
             global CURRENT_TEAM_ID
             ALL_IDS_TO_TEAM[CURRENT_TEAM_ID] = equipoName
             ALL_TEAMS_TO_ID[equipoName] = CURRENT_TEAM_ID
-            CURRENT_TEAM_ID = CURRENT_TEAM_ID + 1
 
-    return seasonIdToTeam
+        seasonIdToGlobalId[currentEquipoId] = CURRENT_TEAM_ID
+
+        CURRENT_TEAM_ID = CURRENT_TEAM_ID + 1
+
+    return seasonIdToGlobalId
 
 
 # Obtengo una lista con los partidos de futbol de una temporada
-def fillSeason(division, temporada, str_partidos, seasonIdToTeam):
-    datosTemporada = DatosTemporada(division, temporada, seasonIdToTeam)
+def fillSeason(datosTemporada, str_partidos):
     # matches = re.findall(r'SP\[\d{0,100}\]\[\d{0,100}\]=\".*?\";', str_partidos)
     matches = re.findall(r'SP\[\d{0,100}\].push\(.*\);', str_partidos)
     for matchData in matches:

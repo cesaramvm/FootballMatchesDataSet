@@ -1,8 +1,5 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 
-import time
-import datetime
-
 class Temporada:
     def __init__(self, año):
         self.año = año
@@ -10,6 +7,7 @@ class Temporada:
         self.jornadas = []
 
 class Equipo:
+    #TODO meter esto en los partidos
     def __init__(self, id_club, nombre, valor):
         self.id_club = id_club
         self.nombre = nombre

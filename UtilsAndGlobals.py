@@ -1,8 +1,8 @@
 import sys
 from Const import *
 
-CURRENT_MATCH_ID = 1
-CURRENT_TEAM_ID = 1
+CURRENT_MATCH_ID = 0
+CURRENT_TEAM_ID = 0
 ALL_TEAMS_TO_ID = dict()
 ALL_IDS_TO_TEAM = dict()
 
