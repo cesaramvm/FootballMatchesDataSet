@@ -31,6 +31,7 @@ class Partido:
         self.golesVisitante = goles_visitante
         self.puntosLocal = puntosLocal
         self.puntosVisitante = puntosVisitante
+        self.objective = "1" if goles_local>goles_visitante else ("X" if goles_local==goles_visitante else "2")
 
     def __str__(self):
         return "%s::%s::%s::%s::%s::%s::%s::%s::%s" \

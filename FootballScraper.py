@@ -16,10 +16,11 @@ def scrapeLeague(division, temporada):
     url = URLS[division] % temporada
     req = requests.get(url)
     soupReq = BeautifulSoup(req.text, "html.parser")
-    seasonData = str(soupReq.find('div', {'id': 'resultats'}))
-    seasonIdToGlobalId = findEquipos(seasonData)
+    parsedSeasonData = str(soupReq.find('div', {'id': 'resultats'}))
+    seasonIdToGlobalId = findEquipos(parsedSeasonData)
     datosTemporada = DatosTemporada(division, temporada, seasonIdToGlobalId)
-    fillSeason(datosTemporada, seasonData)
+    fillSeason(datosTemporada, parsedSeasonData)
+    datosTemporada.printSeasonResults()
     ADD_SEASON_INFO(division, temporada, datosTemporada)
 
 
@@ -41,10 +42,14 @@ def findEquipos(str_resultados):
             global CURRENT_TEAM_ID
             ALL_IDS_TO_TEAM[CURRENT_TEAM_ID] = equipoName
             ALL_TEAMS_TO_ID[equipoName] = CURRENT_TEAM_ID
+            globalEquipoId = CURRENT_TEAM_ID
+            CURRENT_TEAM_ID = CURRENT_TEAM_ID + 1
+        else:
+            globalEquipoId = ALL_TEAMS_TO_ID[equipoName]
 
-        seasonIdToGlobalId[currentEquipoId] = CURRENT_TEAM_ID
+        #TODO Esto de aqui está tremendamente mal. coge la id por la que vayamos del equipo que sea y arreando.
+        seasonIdToGlobalId[currentEquipoId] = globalEquipoId
 
-        CURRENT_TEAM_ID = CURRENT_TEAM_ID + 1
 
     return seasonIdToGlobalId
 
