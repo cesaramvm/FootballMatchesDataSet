@@ -18,19 +18,22 @@ class DatosTemporada:
 
     def addMatch(self, jornada, fecha, idLocal, idVisitante, golesLocal, golesVisitante):
         global CURRENT_MATCH_ID
-        local = ALL_IDS_TO_TEAM[self.seasonIdToGlobalId[idLocal]]
-        visitante = ALL_IDS_TO_TEAM[self.seasonIdToGlobalId[idVisitante]]
+        localGlobalId = self.seasonIdToGlobalId[idLocal]
+        equipoLocal = IDs_TO_TEAM[localGlobalId]
+        visitanteGlobalId = self.seasonIdToGlobalId[idVisitante]
+        equipoVisitante = IDs_TO_TEAM[visitanteGlobalId]
+        #TODO aqui hacer la comprobación de la fecha y sacar el valor del mercado y tal.
 
         if jornada not in self.jornadas:
             self.jornadas[jornada] = dict()
         partidonuevo = Partido(CURRENT_MATCH_ID, self.division, self.temporada, jornada, fecha,
-                               local, visitante, golesLocal, golesVisitante, self.clasificacion[idLocal], self.clasificacion[idVisitante])
+                               equipoLocal, equipoVisitante, golesLocal, golesVisitante, self.clasificacion[localGlobalId], self.clasificacion[visitanteGlobalId])
         self.jornadas[jornada][CURRENT_MATCH_ID] = partidonuevo
 
         puntosLocal = self.puntosPorVictoria if golesLocal>golesVisitante else (1 if golesLocal==golesVisitante else 0)
         puntosVisitante = self.puntosPorVictoria if golesVisitante>golesLocal else (1 if golesLocal==golesVisitante else 0)
-        self.clasificacion[idLocal] += puntosLocal
-        self.clasificacion[idVisitante] += puntosVisitante
+        self.clasificacion[localGlobalId] += puntosLocal
+        self.clasificacion[visitanteGlobalId] += puntosVisitante
 
         CURRENT_MATCH_ID = CURRENT_MATCH_ID + 1
 
@@ -39,9 +42,8 @@ class DatosTemporada:
         iteration = iter(clasiOrdenada)
         for i in range(1,4):
             equipoId = next(iteration)
-            puntosEquipo = str(ALL_IDS_TO_TEAM[equipoId]) + " " + str(self.clasificacion[equipoId])
+            puntosEquipo = str(IDs_TO_TEAM[equipoId]) + " " + str(self.clasificacion[equipoId])
             print(puntosEquipo)
 
-
-        clasiOrdenada = {ALL_IDS_TO_TEAM[k]: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
+        clasiOrdenada = {IDs_TO_TEAM[k]: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
         print(clasiOrdenada)

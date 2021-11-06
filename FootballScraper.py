@@ -10,6 +10,7 @@ def startScrape():
         for season in TEMPORADAS:
             print("****  PROCESANDO TEMPORADA %s ****" % season)
             scrapeLeague(division, season)
+            return
 
 
 def scrapeLeague(division, temporada):
@@ -24,10 +25,6 @@ def scrapeLeague(division, temporada):
     ADD_SEASON_INFO(division, temporada, datosTemporada)
 
 
-def saveInfo(fileName):
-    SAVE_ALL_SEASONS(fileName)
-
-
 def findEquipos(str_resultados):
     seasonIdToGlobalId = dict()
     match = re.findall(r'SE\[\d{0,100}\]=\".*?\";', str_resultados)
@@ -35,22 +32,10 @@ def findEquipos(str_resultados):
         mat = re.sub(r'SE.*?="', '', mat)
         mat = mat.replace('";', '')
         sp = mat.split('|')
-        currentEquipoId = int(sp[0])
+        seasonTeamId = int(sp[0])
         equipoName = CHECK_EQUIPO_NAME(sp[1])
-
-        if not equipoName in ALL_TEAMS_TO_ID:
-            global CURRENT_TEAM_ID
-            ALL_IDS_TO_TEAM[CURRENT_TEAM_ID] = equipoName
-            ALL_TEAMS_TO_ID[equipoName] = CURRENT_TEAM_ID
-            globalEquipoId = CURRENT_TEAM_ID
-            CURRENT_TEAM_ID = CURRENT_TEAM_ID + 1
-        else:
-            globalEquipoId = ALL_TEAMS_TO_ID[equipoName]
-
-        #TODO Esto de aqui está tremendamente mal. coge la id por la que vayamos del equipo que sea y arreando.
-        seasonIdToGlobalId[currentEquipoId] = globalEquipoId
-
-
+        globalEquipoId = CHECK_EQUIPO_ID(equipoName)
+        seasonIdToGlobalId[seasonTeamId] = globalEquipoId
     return seasonIdToGlobalId
 
 
@@ -69,3 +54,7 @@ def fillSeason(datosTemporada, str_partidos):
         datosTemporada.addMatch(jornada, fecha, localId, visitanteId, golesLocal, golesVisitante)
 
     return datosTemporada
+
+
+def saveInfo(fileName):
+    SAVE_ALL_SEASONS(fileName)

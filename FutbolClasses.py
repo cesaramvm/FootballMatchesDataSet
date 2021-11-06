@@ -1,4 +1,5 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
+import copy
 
 class Temporada:
     def __init__(self, año):
@@ -7,14 +8,21 @@ class Temporada:
         self.jornadas = []
 
 class Equipo:
-    #TODO meter esto en los partidos
-    def __init__(self, id_club, nombre, valor):
-        self.id_club = id_club
+    def __init__(self, idGlobalClub, nombre, valorActual = 0):
+        self.idGlobalClub = idGlobalClub
         self.nombre = nombre
-        self.valorActual = valor
+        self.valorActual = valorActual
+
+    def assignValorActual(self, valorActual):
+        aux = copy.copy(self)
+        aux.valorActual = valorActual
+        return aux
 
     def __str__(self):
-        return "%s - %s - %s" % (self.id_club, self.nombre, self.valorActual)
+        return "%s-%s (%s€)" % (self.idGlobalClub, self.nombre, self.valorActual)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Partido:
