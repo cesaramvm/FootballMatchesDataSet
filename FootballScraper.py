@@ -58,3 +58,6 @@ def fillSeason(datosTemporada, str_partidos):
 
 def saveInfo(fileName):
     SAVE_ALL_SEASONS(fileName)
+
+def loadInfo(fileName):
+    LOAD_FROM_FILE(fileName)

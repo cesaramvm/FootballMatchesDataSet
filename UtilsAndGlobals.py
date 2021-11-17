@@ -53,6 +53,20 @@ def SAVE_ALL_SEASONS(fileName):
                     fichero.write(testString)
 
     fichero.close()
-    # print("OJO QUE ESTÁ SIN HACER EL SAVEINFO")
-    # for value in partidos.values():
-    #     fichero.write('%s\n' % str(value))
+
+
+def LOAD_FROM_FILE(fileName):
+    fichero = open(fileName, 'w')
+    fichero.write('idPartido;temporada;division;jornada;EquipoLocal;'
+                  'EquipoVisitante;golesLocal;golesVisitante;fecha\n')
+    for division in ALL_SEASONS_INFO:
+        for temporada in ALL_SEASONS_INFO[division]:
+            datosTemporada = ALL_SEASONS_INFO[division][temporada]
+            for jornada in datosTemporada.jornadas:
+                partidosJornada = datosTemporada.jornadas[jornada]
+                for partidoId in partidosJornada:
+                    partido = partidosJornada[partidoId]
+                    testString = '%s;%s;%s;%s;%s;%s;%s;%s;%s\n' % (str(partido.idPartido), str(partido.temporada), str(partido.division), str(partido.jornada), str(partido.local.nombre), str(partido.visitante.nombre), str(partido.golesLocal), str(partido.golesVisitante), str(partido.fecha))
+                    fichero.write(testString)
+
+    fichero.close()

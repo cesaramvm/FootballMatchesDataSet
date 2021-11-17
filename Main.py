@@ -5,8 +5,8 @@ from FutbolClasses import *
 
 startScrape()
 saveInfo('TestSave.txt')
-
-# scrapeBD.loadScrape('DataSetPartidos.1.txt')
+#
+# loadInfo('DataSetPartidos.1.txt')
 
 #
 # from ScrapBDFutbol import *

@@ -1,19 +1,13 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 import copy
 
-class Temporada:
-    def __init__(self, año):
-        self.año = año
-        self.teams = []
-        self.jornadas = []
-
 class Equipo:
-    def __init__(self, idGlobalClub, nombre, valorActual = 0):
+    def __init__(self, idGlobalClub, nombre, valorActual=0):
         self.idGlobalClub = idGlobalClub
         self.nombre = nombre
         self.valorActual = valorActual
 
-    def assignValorActual(self, valorActual):
+    def returnWithCurrentValue(self, valorActual):
         aux = copy.copy(self)
         aux.valorActual = valorActual
         return aux
