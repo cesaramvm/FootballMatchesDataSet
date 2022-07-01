@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import requests, re, json
 from DatosTemporada import DatosTemporada
 
-
 def startScrape():
     for division in range(1, 3):
         print("****  PROCESANDO DIVISIÓN %s ****" % division)
