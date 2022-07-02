@@ -20,22 +20,21 @@ class Equipo:
 
 
 class Partido:
-    def __init__(self, id_partido, division, temporada,  jornada, fecha, local,
-                 visitante, goles_local, goles_visitante, puntosLocal, puntosVisitante):
+    def __init__(self, id_partido, division, temporada, jornada, fecha, idLocal,
+                 idVisitante, puntosLocal, puntosVisitante, goles_local, goles_visitante):
         self.idPartido = id_partido
         self.temporada = temporada
         self.division = division
         self.jornada = jornada
         self.fecha = fecha
-        self.local = local
-        self.visitante = visitante
+        self.idLocal = idLocal
+        self.idVisitante = idVisitante
         self.golesLocal = goles_local
         self.golesVisitante = goles_visitante
         self.puntosLocal = puntosLocal
         self.puntosVisitante = puntosVisitante
-        self.objective = "1" if goles_local>goles_visitante else ("X" if goles_local==goles_visitante else "2")
 
     def __str__(self):
         return "%s::%s::%s::%s::%s::%s::%s::%s::%s" \
-               % (self.idPartido, self.temporada, self.division, self.jornada, self.local, self.visitante,
+               % (self.idPartido, self.temporada, self.division, self.jornada, self.idLocal, self.idVisitante,
                   self.golesLocal, self.golesVisitante, self.fecha)
