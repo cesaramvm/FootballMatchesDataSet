@@ -3,8 +3,11 @@
 from FootballScraper import *
 from FutbolClasses import *
 
-startScrape(SHORT_TEMPORADAS)
+LOAD_MARKET_VALUES()
+startScrape(TEMPORADAS)
 saveInfo('TestSave.txt')
+
+
 #
 # loadInfo('DataSetPartidos.1.txt')
 

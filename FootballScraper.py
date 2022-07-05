@@ -9,7 +9,7 @@ def startScrape(temporadas):
         for temporada in temporadas:
             print("****  PROCESANDO TEMPORADA %s ****" % temporada)
             scrapeLeague(division, temporada)
-            return
+            # return
 
 
 def scrapeLeague(division, temporada):
@@ -20,7 +20,7 @@ def scrapeLeague(division, temporada):
     seasonData = DatosTemporada(division, temporada, seasonTeamsIdToGlobalId.values())
     fillSeason(seasonData, parsedSeasonData, seasonTeamsIdToGlobalId)
     # seasonData.printSeasonResults()
-    seasonData.printSeasonWinner()
+    seasonData.printSeasonWinnerTest()
     ADD_SEASON_INFO(division, temporada, seasonData)
 
 

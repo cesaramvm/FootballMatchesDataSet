@@ -1,13 +1,72 @@
 import sys
 from Const import *
 from FutbolClasses import *
+import requests
+from bs4 import BeautifulSoup
+
 
 CURRENT_MATCH_ID = 0
 CURRENT_TEAM_ID = 0
 TEAM_NAMES_TO_ID = dict()
 IDs_TO_TEAM = dict()
 
+
 ALL_SEASONS_INFO = dict()
+
+MARKET_INFO = dict()
+firstMarketDate = datetime(2010, 8, 1)
+
+def GET_MARKET_VALUE(equipoName, matchDate):
+    if equipoName in MARKET_NAMES_CORRECTION:
+        equipoName = MARKET_NAMES_CORRECTION[equipoName]
+        if (matchDate > firstMarketDate):
+            realMarketDate = min(FECHAS_VALORES, key=lambda sub: abs(sub - matchDate))
+            if(realMarketDate in MARKET_INFO):
+                return MARKET_INFO[realMarketDate][equipoName]
+            else:
+                teamsValues = dict()
+                for division in range(1, 3):
+                    marketUrl = MARKET_URL[division] % realMarketDate.strftime("%Y-%m-%d")
+                    req = requests.get(marketUrl, headers={'User-Agent': 'Custom'})
+
+                    localMarketNodes = BeautifulSoup(req.text, "html.parser").find_all('td', {'class': 'hauptlink no-border-links'})
+                    for localNode in localMarketNodes:
+                        teamName = localNode.find("a")['title']
+                        teamValue = localNode.find_next_siblings()[1].find("a").string
+                        if(teamValue == "-"):
+                            teamValue = -1
+                        else:
+                            teamValue = float(teamValue.split(" ")[0].replace(",","."))
+                        teamsValues[teamName] = teamValue
+
+                    MARKET_INFO[realMarketDate] = teamsValues
+                return MARKET_INFO[realMarketDate][equipoName]
+    else:
+        return -1
+
+def PRINT_MARKET_VALUES():
+    print(MARKET_INFO)
+
+def SAVE_MARKET_VALUES():
+    import json
+    with open('market_values.json', 'w') as json_obj:
+        keys_as_string = json.dumps({k.strftime("%d/%m/%Y"): MARKET_INFO[k] for k in MARKET_INFO})
+        json.dump(keys_as_string, json_obj, indent=4)
+
+def LOAD_MARKET_VALUES():
+    import json
+    global MARKET_INFO
+    MARKET_INFO = dict()
+    try:
+        with open('market_values.json', 'r') as load_obj:
+            a = json.load(load_obj)
+            """Convert the file string into a dictionary"""
+            a = json.loads(a)
+            a = {datetime.strptime(k, '%d/%m/%Y'): a[k] for k in a}
+        MARKET_INFO=a
+    except:
+        pass
+
 
 def CHECK_EQUIPO_ID(equipoName):
         if not equipoName in TEAM_NAMES_TO_ID:
@@ -40,8 +99,12 @@ def ADD_SEASON_INFO(division, temporada, seasonInfo):
 
 def SAVE_ALL_SEASONS(fileName):
     fichero = open(fileName, 'w')
-    fichero.write('idPartido;temporada;division;jornada;EquipoLocal;'
-                  'EquipoVisitante;golesLocal;golesVisitante;fecha\n')
+    fichero.write(  'idPartido;division;temporada;jornada;fecha;'
+                    'EquipoLocal;localValue;PuntosClasiLocal;'
+                    'GolesAFavorLocal;GolesEnContraLocal;'
+                    'EquipoVisitante;visitanteValue;PuntosClasiVisitante;'
+                    'GolesAFavorVisitante;GolesEnContraVisitante;'
+                    'golesLocal;golesVisitante;golDiff\n')
     for division in ALL_SEASONS_INFO:
         for temporada in ALL_SEASONS_INFO[division]:
             datosTemporada = ALL_SEASONS_INFO[division][temporada]
@@ -49,7 +112,14 @@ def SAVE_ALL_SEASONS(fileName):
                 partidosJornada = datosTemporada.jornadas[jornada]
                 for partidoId in partidosJornada:
                     partido = partidosJornada[partidoId]
-                    testString = '%s;%s;%s;%s;%s;%s;%s;%s;%s\n' % (str(partido.idPartido), str(partido.temporada), str(partido.division), str(partido.jornada), str(IDs_TO_TEAM[partido.idLocal]), str(IDs_TO_TEAM[partido.idVisitante]), str(partido.golesLocal), str(partido.golesVisitante), str(partido.fecha))
+
+                    testString = "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" \
+                    % (str(partido.idPartido), str(partido.division), str(partido.temporada), str(partido.jornada), str(partido.fecha),
+                       str(IDs_TO_TEAM[partido.idLocal].nombre), str(partido.localValue), str(partido.puntosLocal),
+                       str(partido.golesafavorlocal), str(partido.golesencontralocal),
+                       str(IDs_TO_TEAM[partido.idVisitante].nombre), str(partido.visitanteValue), str(partido.puntosVisitante),
+                       str(partido.golesafavorvisitante), str(partido.golesencontravisitante),
+                       str(partido.golesLocal), str(partido.golesVisitante), str(partido.golesLocal-partido.golesVisitante))
                     fichero.write(testString)
 
     fichero.close()
