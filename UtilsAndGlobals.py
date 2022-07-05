@@ -17,6 +17,7 @@ MARKET_INFO = dict()
 firstMarketDate = datetime(2010, 8, 1)
 
 def GET_MARKET_VALUE(equipoName, matchDate):
+    #TODO ojo que esto al madrid y al barça a veces les pone 1.01 (millón) y no mil millon.
     if equipoName in MARKET_NAMES_CORRECTION:
         equipoName = MARKET_NAMES_CORRECTION[equipoName]
         if (matchDate > firstMarketDate):
