@@ -48,8 +48,12 @@ class DatosTemporada:
         self.golesafavor[visitanteId] += golesVisitante
         self.golesencontra[localId] += golesVisitante
         self.golesencontra[visitanteId] += golesLocal
-
+        self.orderClassification()
         CURRENT_MATCH_ID = CURRENT_MATCH_ID + 1
+
+    def orderClassification(self):
+        self.clasificacion = {k: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
+
 
     def printSeasonResults(self):
         clasiOrdenada = {k: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
@@ -64,14 +68,6 @@ class DatosTemporada:
 
 
     def printSeasonWinner(self):
-        clasiOrdenada = {k: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
-        iteration = iter(clasiOrdenada)
-        for i in range(1,2):
-            equipoId = next(iteration)
-            puntosEquipo = str(IDs_TO_TEAM[equipoId]) + " " + str(self.clasificacion[equipoId])
-            print(puntosEquipo)
-
-    def printSeasonWinnerTest(self):
         maxPuntos = max(self.clasificacion.items(), key=lambda x: x[1])[1]
         equiposGanadores = [equipoId for equipoId, puntos in self.clasificacion.items() if puntos == maxPuntos]
 

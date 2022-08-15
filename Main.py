@@ -5,7 +5,7 @@ from FutbolClasses import *
 
 LOAD_MARKET_VALUES()
 startScrape(TEMPORADAS)
-saveInfo('TestSave.txt')
+saveInfo('TestSave.csv')
 
 
 #

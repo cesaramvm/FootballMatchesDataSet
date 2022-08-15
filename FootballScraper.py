@@ -20,7 +20,7 @@ def scrapeLeague(division, temporada):
     seasonData = DatosTemporada(division, temporada, seasonTeamsIdToGlobalId.values())
     fillSeason(seasonData, parsedSeasonData, seasonTeamsIdToGlobalId)
     # seasonData.printSeasonResults()
-    seasonData.printSeasonWinnerTest()
+    seasonData.printSeasonWinner()
     ADD_SEASON_INFO(division, temporada, seasonData)
 
 

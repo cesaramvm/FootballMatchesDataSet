@@ -37,6 +37,7 @@ def GET_MARKET_VALUE(equipoName, matchDate):
                         if(teamValue == "-"):
                             teamValue = -1
                         else:
+                            #Aqui justo a veces te entra algo como  "768,60 mill. €" o "1,06 mil mill. €"
                             teamValue = float(teamValue.split(" ")[0].replace(",","."))
                         teamsValues[teamName] = teamValue
 
