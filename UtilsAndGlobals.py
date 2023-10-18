@@ -4,7 +4,6 @@ from FutbolClasses import *
 import requests
 from bs4 import BeautifulSoup
 
-
 CURRENT_MATCH_ID = 0
 CURRENT_TEAM_ID = 0
 TEAM_NAMES_TO_ID = dict()
