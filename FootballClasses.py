@@ -1,5 +1,6 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 import copy
+from dataclasses import dataclass
 
 class Equipo:
     def __init__(self, idGlobalClub, nombre, valorActual=0):
@@ -18,15 +19,41 @@ class Equipo:
     def __repr__(self):
         return self.__str__()
 
-
+@dataclass
 class Partido:
-    def __init__(self, id_partido, division, temporada, jornada, fecha,
+    idPartido: int
+    division: str
+    temporada: str
+    jornada: int
+    fecha: str
+    idLocal: int
+    localValue: str
+    puntosLocal: int
+    golesafavorlocal: int
+    golesencontralocal: int
+    idVisitante: int
+    visitanteValue: str
+    puntosVisitante: int
+    golesafavorvisitante: int
+    golesencontravisitante: int
+    golesLocal: int
+    golesVisitante: int
+
+    def __str__(self):
+        return "%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s" \
+               % (self.idPartido, self.division, self.temporada, self.jornada, self.fecha,
+                  self.idLocal, self.localValue, self.puntosLocal, self.golesafavorlocal, self.golesencontralocal,
+                  self.idVisitante, self.visitanteValue, self.puntosVisitante, self.golesafavorvisitante, self.golesencontravisitante,
+                  self.golesLocal, self.golesVisitante)
+""" 
+class Partido:
+    def __init__(self, idPartido, division, temporada, jornada, fecha,
                  localId, localValue, puntosClasificacionLocal,
                  golesafavorlocal, golesencontralocal,
                  visitanteId, visitanteValue, puntosClasificacionVisitante,
                  golesafavorvisitante, golesencontravisitante,
                  goles_local, goles_visitante):
-        self.idPartido = id_partido
+        self.idPartido = idPartido
         self.division = division
         self.temporada = temporada
         self.jornada = jornada
@@ -50,3 +77,4 @@ class Partido:
                   self.idLocal, self.localValue, self.puntosLocal, self.golesafavorlocal, self.golesencontralocal,
                   self.idVisitante, self.visitanteValue, self.puntosVisitante, self.golesafavorvisitante, self.golesencontravisitante,
                   self.golesLocal, self.golesVisitante)
+ """
