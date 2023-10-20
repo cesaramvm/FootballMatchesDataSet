@@ -18,7 +18,7 @@ def scrapeLeague(division, temporada):
     parsedSeasonData = str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
     seasonTeamsIdToGlobalId = getTeamsIdsToGlobalIdsDict(parsedSeasonData)
     seasonData = DatosTemporada(division, temporada, seasonTeamsIdToGlobalId.values())
-    fillSeason(seasonData, parsedSeasonData, seasonTeamsIdToGlobalId)
+    seasonData.fillSeason(parsedSeasonData, seasonTeamsIdToGlobalId)
     # seasonData.printSeasonResults()
     seasonData.printSeasonWinner()
     ADD_SEASON_INFO(division, temporada, seasonData)
@@ -46,11 +46,11 @@ def fillSeason(datosTemporada, parsedSeasonData, seasonTeamsIdToGlobalId):
         jornada = re.findall(r'SP\[.*?]', matchData)[0].replace('SP[', '').replace(']', '')
         jsonInfo = json.loads(re.findall(r'\{.*\}', matchData)[0])
         fecha = jsonInfo.get("d")
-        localId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a1"))]
-        visitanteId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a2"))]
+        localGlobalId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a1"))]
+        visitanteGlobalId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a2"))]
         golesLocal = int(jsonInfo.get("g1"))
         golesVisitante = int(jsonInfo.get("g2"))
-        datosTemporada.addMatch(jornada, fecha, localId, visitanteId, golesLocal, golesVisitante)
+        datosTemporada.addMatch(jornada, fecha, localGlobalId, visitanteGlobalId, golesLocal, golesVisitante)
 
     return datosTemporada
 

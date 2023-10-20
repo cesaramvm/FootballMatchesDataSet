@@ -2,6 +2,7 @@
 
 from FootballScraper import *
 from FootballClasses import *
+from Const import *
 
 LOAD_MARKET_VALUES()
 startScrape(SHORT_TEMPORADAS)
@@ -9,7 +10,7 @@ saveInfo('TestSave.csv')
 
 
 #
-# loadInfo('DataSetPartidos.1.txt')
+# LOAD_ALL_SEASONS('DataSetPartidos.1.txt')
 
 #
 # from ScrapBDFutbol import *

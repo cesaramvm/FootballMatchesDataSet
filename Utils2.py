@@ -4,8 +4,8 @@ from FootballClasses import *
 import requests
 from bs4 import BeautifulSoup
 
-CURRENT_MATCH_ID = 1
-CURRENT_TEAM_ID = 1
+CURRENT_MATCH_ID = 0
+CURRENT_TEAM_ID = 0
 TEAM_NAMES_TO_ID = dict()
 IDs_TO_TEAM = dict()
 
@@ -13,16 +13,18 @@ IDs_TO_TEAM = dict()
 ALL_SEASONS_INFO = dict()
 
 MARKET_INFO = dict()
-firstMarketDate = datetime(2010, 8, 1)
+firstMarketDate = datetime(2010, 11, 1)
 
-def GET_MARKET_VALUE(equipoName, matchDate):
+def GET_MARKET_VALUE(equipo, matchDate):
     #TODO ojo que esto al madrid y al barça a veces les pone 1.01 (millón) y no mil millon.
-    if equipoName in MARKET_NAMES_CORRECTION:
-        equipoName = MARKET_NAMES_CORRECTION[equipoName]
+    if equipo in MARKET_NAMES_CORRECTION:
+        equipoNames = MARKET_NAMES_CORRECTION[equipo]
         if (matchDate > firstMarketDate):
             realMarketDate = min(FECHAS_VALORES, key=lambda sub: abs(sub - matchDate))
             if(realMarketDate in MARKET_INFO):
-                return MARKET_INFO[realMarketDate][equipoName]
+                marketCurrentDate = MARKET_INFO[realMarketDate]
+                equipoName = equipoNames if isinstance(equipoNames, str) else next((key for key in equipoNames if key in marketCurrentDate), None)
+                return marketCurrentDate[equipoName]
             else:
                 teamsValues = dict()
                 for division in range(1, 3):
@@ -39,11 +41,12 @@ def GET_MARKET_VALUE(equipoName, matchDate):
                             #Aqui justo a veces te entra algo como  "768,60 mill. €" o "1,06 mil mill. €"
                             teamValue = float(teamValue.split(" ")[0].replace(",","."))
                         teamsValues[teamName] = teamValue
-
+                    equipoName = equipoNames if isinstance(equipoNames, str) else next((key for key in equipoNames if key in marketCurrentDate), None)
                     MARKET_INFO[realMarketDate] = teamsValues
                 return MARKET_INFO[realMarketDate][equipoName]
     else:
-        return -1
+        print("{} equipo not in  MARKET_NAMES_CORRECTION ".format(equipo))
+    return -1
 
 def PRINT_MARKET_VALUES():
     print(MARKET_INFO)
@@ -126,23 +129,5 @@ def SAVE_ALL_SEASONS(fileName):
     fichero.close()
 
 
-def LOAD_ALL_SEASONS(fileName):
-    ALL_SEASONS_INFO = {}
-    
-    with open(fileName, 'r') as file:
-        # Skip the header line
-        next(file)
-        for line in file:
-            parts = line.strip().split(';')
-            partido = Partido(*parts)
-
-            # Check if the division and season keys exist in the dictionary
-            if partido.division not in ALL_SEASONS_INFO:
-                ALL_SEASONS_INFO[partido.division] = {}
-            if partido.temporada not in ALL_SEASONS_INFO[partido.division]:
-                ALL_SEASONS_INFO[partido.division][partido.temporada] = {}
-
-            # Add the partido object to the dictionary
-            ALL_SEASONS_INFO[partido.division][partido.temporada][partido.jornada] = partido
-
-    return ALL_SEASONS_INFO
+def LOAD_FROM_FILE(fileName):
+    print("NOT YET WORKING")
