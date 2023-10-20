@@ -1,10 +1,10 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 
 from FootballScraper import *
-from FutbolClasses import *
+from FootballClasses import *
 
 LOAD_MARKET_VALUES()
-startScrape(TEMPORADAS)
+startScrape(SHORT_TEMPORADAS)
 saveInfo('TestSave.csv')
 
 

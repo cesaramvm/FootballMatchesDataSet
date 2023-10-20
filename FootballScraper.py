@@ -4,7 +4,7 @@ import requests, re, json
 from DatosTemporada import DatosTemporada
 
 def startScrape(temporadas):
-    for division in range(1, 3):
+    for division in range(2, 0, -1):
         print("****  PROCESANDO DIVISIÓN %s ****" % division)
         for temporada in temporadas:
             print("****  PROCESANDO TEMPORADA %s ****" % temporada)

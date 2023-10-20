@@ -1,4 +1,4 @@
-from FutbolClasses import *
+from FootballClasses import *
 from datetime import datetime
 from UtilsAndGlobals import *
 class DatosTemporada:
