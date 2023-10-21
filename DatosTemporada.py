@@ -1,13 +1,13 @@
-from FootballClasses import *
+import FootballScraper as fs
+import FootballClasses as fc
+import UtilsAndGlobals as ut
 from datetime import datetime
-from UtilsAndGlobals import *
 import re, json
 class DatosTemporada:
 
-    def __init__(self, division, temporada, globalTeamIds):
+    def __init__(self, division, temporada):
         self.division = division
         self.temporada = temporada
-        self.numJornadas = 2*(len(globalTeamIds)-1)
 
         temporadaAñoStart = int(temporada.split("-")[0])
         self.puntosPorVictoria = 3 if temporadaAñoStart > 1994 else 2
@@ -16,33 +16,63 @@ class DatosTemporada:
         self.golesafavor = dict()
         self.golesencontra = dict()
         self.jornadas = dict()
-        for equipoId in globalTeamIds:
+
+
+    def loadFromScraping(self):
+        parsedSeasonData = fs.parseSeasonData(self.division, self.temporada)
+        teamsSeasonIdToGlobalId = fs.getTeamsSeasonIdToGlobalIdDict(parsedSeasonData)
+        matchesArray = fs.getMatchesArray(parsedSeasonData)
+        self.loadEquipos(teamsSeasonIdToGlobalId)
+        self.loadMatches(matchesArray)
+
+    def loadFromData(self):
+        print("NOT YET IMPLEMENTED")
+
+
+    def loadEquipos(self, teamsSeasonIdToGlobalId):
+        self.numJornadas = 2*(len(teamsSeasonIdToGlobalId)-1)
+        for equipoId in teamsSeasonIdToGlobalId.values():
             self.clasificacion[equipoId] = 0
             self.golesafavor[equipoId] = 0
             self.golesencontra[equipoId] = 0
+    
+    def loadMatches(self, matchesArray):
+        for match in matchesArray:
+            jornada = match[0]
+            fecha = match[1]
+            localGlobalId = match[2]
+            localName = match[3]
+            visitanteGlobalId = match[4]
+            visitanteName =match[5]
+            golesLocal = match[6]
+            golesVisitante = match[7]
+            golDiff = match[8]
+            self.addMatch(jornada, fecha, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff)
 
-
-    def addMatch(self, jornada, fecha, localGlobalId, visitanteGlobalId, golesLocal, golesVisitante):
-        global CURRENT_MATCH_ID
+    def addMatch(self, jornada, fecha, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff):
         matchDate = datetime.strptime(fecha, '%d/%m/%Y')
-        localName = IDs_TO_TEAM[localGlobalId].nombre
-        visitanteName = IDs_TO_TEAM[visitanteGlobalId].nombre
-        print("jornada-{}, fecha-{}, local-{}-{}, visitante-{}-{}, golesLocal-{}, golesVisitante-{}".format(jornada, fecha, localName, localGlobalId, visitanteName, visitanteGlobalId, golesLocal, golesVisitante))
-        localValue = GET_MARKET_VALUE(localName, matchDate)
-        visitanteValue = GET_MARKET_VALUE(visitanteName, matchDate)
+        localName = ut.IDs_TO_TEAM[localGlobalId].nombre
+        visitanteName = ut.IDs_TO_TEAM[visitanteGlobalId].nombre
+        #print("jornada-{}, fecha-{}, local-{}-{}, visitante-{}-{}, golesLocal-{}, golesVisitante-{}".format(jornada, fecha, localName, localGlobalId, visitanteName, visitanteGlobalId, golesLocal, golesVisitante))
+        localMarketValue = ut.GET_MARKET_VALUE(localName, matchDate)
+        visitanteMarketValue = ut.GET_MARKET_VALUE(visitanteName, matchDate)
 
-        # print(localName, matchDate.strftime("%d/%m/%Y"), localValue)
-        # print(visitanteName, matchDate.strftime("%d/%m/%Y"), visitanteValue)
+        #print(localName, matchDate.strftime("%d/%m/%Y"), localValue)
+        #print(visitanteName, matchDate.strftime("%d/%m/%Y"), visitanteValue)
 
         if jornada not in self.jornadas:
             self.jornadas[jornada] = dict()
-        self.jornadas[jornada][CURRENT_MATCH_ID] = Partido(CURRENT_MATCH_ID, self.division, self.temporada, jornada, fecha,
-                                                            localGlobalId, localValue, self.clasificacion[localGlobalId],
+        self.jornadas[jornada][ut.CURRENT_MATCH_ID] = fc.Partido(ut.CURRENT_MATCH_ID, self.division, self.temporada, jornada, fecha,
+                                                            localGlobalId, localName, localMarketValue, self.clasificacion[localGlobalId],
                                                             self.golesafavor[localGlobalId], self.golesencontra[localGlobalId],
-                                                            visitanteGlobalId, visitanteValue,self.clasificacion[visitanteGlobalId],
+                                                            visitanteGlobalId, visitanteName, visitanteMarketValue,self.clasificacion[visitanteGlobalId],
                                                             self.golesafavor[visitanteGlobalId], self.golesencontra[visitanteGlobalId],
-                                                            golesLocal, golesVisitante)
+                                                            golesLocal, golesVisitante, golDiff)
+        self.updateClassification(golesLocal, golesVisitante, localGlobalId, visitanteGlobalId)
+        ut.CURRENT_MATCH_ID += 1
+        
 
+    def updateClassification(self, golesLocal, golesVisitante, localGlobalId, visitanteGlobalId):
         puntosLocal = self.puntosPorVictoria if golesLocal>golesVisitante else (1 if golesLocal==golesVisitante else 0)
         puntosVisitante = self.puntosPorVictoria if golesVisitante>golesLocal else (1 if golesLocal==golesVisitante else 0)
         self.clasificacion[localGlobalId] += puntosLocal
@@ -51,26 +81,6 @@ class DatosTemporada:
         self.golesafavor[visitanteGlobalId] += golesVisitante
         self.golesencontra[localGlobalId] += golesVisitante
         self.golesencontra[visitanteGlobalId] += golesLocal
-        self.orderClassification()
-        CURRENT_MATCH_ID = CURRENT_MATCH_ID + 1
-        
-    # Obtengo una lista con los partidos de futbol de una temporada
-    def fillSeason(self, parsedSeasonData, seasonTeamsIdToGlobalId):
-        # matches = re.findall(r'SP\[\d{0,100}\]\[\d{0,100}\]=\".*?\";', str_partidos)
-        matches = re.findall(r'SP\[\d{0,100}\].push\(.*\);', parsedSeasonData)
-        for matchData in matches:
-            jornada = re.findall(r'SP\[.*?]', matchData)[0].replace('SP[', '').replace(']', '')
-            jsonInfo = json.loads(re.findall(r'\{.*\}', matchData)[0])
-            fecha = jsonInfo.get("d")
-            localGlobalId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a1"))]
-            visitanteGlobalId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a2"))]
-            golesLocal = int(jsonInfo.get("g1"))
-            golesVisitante = int(jsonInfo.get("g2"))
-            self.addMatch(jornada, fecha, localGlobalId, visitanteGlobalId, golesLocal, golesVisitante)
-
-
-
-    def orderClassification(self):
         self.clasificacion = {k: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
 
 
@@ -91,9 +101,9 @@ class DatosTemporada:
         equiposGanadores = [equipoId for equipoId, puntos in self.clasificacion.items() if puntos == maxPuntos]
 
         if len(equiposGanadores)>1:
-            nombreGanador = TIED_SEASON_WINNERS[self.division][self.temporada]
-            teamID = TEAM_NAMES_TO_ID[nombreGanador]
-            print("EMPATE: GANADOR->",IDs_TO_TEAM[teamID])
+            nombreGanador = ut.TIED_SEASON_WINNERS[self.division][self.temporada]
+            teamID = ut.TEAM_NAMES_TO_ID[nombreGanador]
+            print("EMPATE: GANADOR->",ut.IDs_TO_TEAM[teamID])
         else:
-            print(IDs_TO_TEAM[equiposGanadores[0]])
+            print(ut.IDs_TO_TEAM[equiposGanadores[0]])
 

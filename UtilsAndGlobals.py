@@ -1,6 +1,6 @@
 import sys
 from Const import *
-from FootballClasses import *
+import FootballClasses as fc
 import requests
 from bs4 import BeautifulSoup
 
@@ -73,7 +73,7 @@ def CHECK_EQUIPO_ID(equipoName):
         if not equipoName in TEAM_NAMES_TO_ID:
             global CURRENT_TEAM_ID
             TEAM_NAMES_TO_ID[equipoName] = CURRENT_TEAM_ID
-            equipo = Equipo(CURRENT_TEAM_ID, equipoName)
+            equipo = fc.Equipo(CURRENT_TEAM_ID, equipoName)
             IDs_TO_TEAM[CURRENT_TEAM_ID] = equipo
             globalEquipoId = CURRENT_TEAM_ID
             CURRENT_TEAM_ID = CURRENT_TEAM_ID + 1
@@ -101,9 +101,9 @@ def ADD_SEASON_INFO(division, temporada, seasonInfo):
 def SAVE_ALL_SEASONS(fileName):
     fichero = open(fileName, 'w')
     fichero.write(  'idPartido;division;temporada;jornada;fecha;'
-                    'EquipoLocal;localValue;PuntosClasiLocal;'
+                    'LocalName;EquipoLocalId;localMarketValue;PuntosClasiLocal;'
                     'GolesAFavorLocal;GolesEnContraLocal;'
-                    'EquipoVisitante;visitanteValue;PuntosClasiVisitante;'
+                    'VisitanteName;EquipoVisitanteId;visitanteMarketValue;PuntosClasiVisitante;'
                     'GolesAFavorVisitante;GolesEnContraVisitante;'
                     'golesLocal;golesVisitante;golDiff\n')
     for division in ALL_SEASONS_INFO:
@@ -114,29 +114,30 @@ def SAVE_ALL_SEASONS(fileName):
                 for partidoId in partidosJornada:
                     partido = partidosJornada[partidoId]
 
-                    testString = "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" \
+                    testString = "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" \
                     % (str(partido.idPartido), str(partido.division), str(partido.temporada), str(partido.jornada), str(partido.fecha),
-                       str(IDs_TO_TEAM[partido.idLocal].nombre), str(partido.localValue), str(partido.puntosLocal),
+                       str(IDs_TO_TEAM[partido.idLocal].nombre), str(partido.idLocal), str(partido.localMarketValue), str(partido.puntosLocal),
                        str(partido.golesafavorlocal), str(partido.golesencontralocal),
-                       str(IDs_TO_TEAM[partido.idVisitante].nombre), str(partido.visitanteValue), str(partido.puntosVisitante),
+                       str(IDs_TO_TEAM[partido.idVisitante].nombre), str(partido.idVisitante), str(partido.visitanteMarketValue), str(partido.puntosVisitante),
                        str(partido.golesafavorvisitante), str(partido.golesencontravisitante),
-                       str(partido.golesLocal), str(partido.golesVisitante), str(partido.golesLocal-partido.golesVisitante))
+                       str(partido.golesLocal), str(partido.golesVisitante), str(partido.golDiff))
                     fichero.write(testString)
 
     fichero.close()
 
 
 def LOAD_ALL_SEASONS(fileName):
-    ALL_SEASONS_INFO = {}
+    global ALL_SEASONS_INFO
+    ALL_SEASONS_INFO = dict()
     
     with open(fileName, 'r') as file:
         # Skip the header line
         next(file)
         for line in file:
             parts = line.strip().split(';')
-            partido = Partido(*parts)
-
-            # Check if the division and season keys exist in the dictionary
+            partido = fc.Partido(*parts)
+            print(partido.division)
+            print(type(partido.division))
             if partido.division not in ALL_SEASONS_INFO:
                 ALL_SEASONS_INFO[partido.division] = {}
             if partido.temporada not in ALL_SEASONS_INFO[partido.division]:
@@ -145,4 +146,4 @@ def LOAD_ALL_SEASONS(fileName):
             # Add the partido object to the dictionary
             ALL_SEASONS_INFO[partido.division][partido.temporada][partido.jornada] = partido
 
-    return ALL_SEASONS_INFO
+    print(ALL_SEASONS_INFO.keys())

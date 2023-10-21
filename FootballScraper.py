@@ -1,30 +1,17 @@
-from UtilsAndGlobals import *
 from bs4 import BeautifulSoup
+import UtilsAndGlobals as ut
 import requests, re, json
-from DatosTemporada import DatosTemporada
 
-def startScrape(temporadas):
-    for division in range(2, 0, -1):
-        print("****  PROCESANDO DIVISIÓN %s ****" % division)
-        for temporada in temporadas:
-            print("****  PROCESANDO TEMPORADA %s ****" % temporada)
-            scrapeLeague(division, temporada)
-            # return
+teamsSeasonIdToGlobalId = dict()
 
-
-def scrapeLeague(division, temporada):
-    url = URLS[division] % temporada
+def parseSeasonData(division, temporada):
+    url = ut.URLS[division] % temporada
     req = requests.get(url)
-    parsedSeasonData = str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
-    seasonTeamsIdToGlobalId = getTeamsIdsToGlobalIdsDict(parsedSeasonData)
-    seasonData = DatosTemporada(division, temporada, seasonTeamsIdToGlobalId.values())
-    seasonData.fillSeason(parsedSeasonData, seasonTeamsIdToGlobalId)
-    # seasonData.printSeasonResults()
-    seasonData.printSeasonWinner()
-    ADD_SEASON_INFO(division, temporada, seasonData)
+    return str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
 
 
-def getTeamsIdsToGlobalIdsDict(parsedSeasonData):
+def getTeamsSeasonIdToGlobalIdDict(parsedSeasonData):
+    global teamsSeasonIdToGlobalId
     seasonIdToGlobalId = dict()
     match = re.findall(r'SE\[\d{0,100}\]=\".*?\";', parsedSeasonData)
     for mat in match:
@@ -32,31 +19,28 @@ def getTeamsIdsToGlobalIdsDict(parsedSeasonData):
         mat = mat.replace('";', '')
         sp = mat.split('|')
         seasonTeamId = int(sp[0])
-        teamName = CHECK_EQUIPO_NAME(sp[1])
-        globalTeamId = CHECK_EQUIPO_ID(teamName)
+        teamName = ut.CHECK_EQUIPO_NAME(sp[1])
+        globalTeamId = ut.CHECK_EQUIPO_ID(teamName)
         seasonIdToGlobalId[seasonTeamId] = globalTeamId
+    teamsSeasonIdToGlobalId = seasonIdToGlobalId
     return seasonIdToGlobalId
 
 
-# Obtengo una lista con los partidos de futbol de una temporada
-def fillSeason(datosTemporada, parsedSeasonData, seasonTeamsIdToGlobalId):
+def getMatchesArray(parsedSeasonData):
+    global teamsSeasonIdToGlobalId
     # matches = re.findall(r'SP\[\d{0,100}\]\[\d{0,100}\]=\".*?\";', str_partidos)
     matches = re.findall(r'SP\[\d{0,100}\].push\(.*\);', parsedSeasonData)
+    matchesArray = []
     for matchData in matches:
         jornada = re.findall(r'SP\[.*?]', matchData)[0].replace('SP[', '').replace(']', '')
         jsonInfo = json.loads(re.findall(r'\{.*\}', matchData)[0])
         fecha = jsonInfo.get("d")
-        localGlobalId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a1"))]
-        visitanteGlobalId = seasonTeamsIdToGlobalId[int(jsonInfo.get("a2"))]
+        localGlobalId = teamsSeasonIdToGlobalId[int(jsonInfo.get("a1"))]
+        localName = ut.IDs_TO_TEAM[localGlobalId]
+        visitanteGlobalId = teamsSeasonIdToGlobalId[int(jsonInfo.get("a2"))]
+        visitanteName = ut.IDs_TO_TEAM[visitanteGlobalId]
         golesLocal = int(jsonInfo.get("g1"))
         golesVisitante = int(jsonInfo.get("g2"))
-        datosTemporada.addMatch(jornada, fecha, localGlobalId, visitanteGlobalId, golesLocal, golesVisitante)
-
-    return datosTemporada
-
-
-def saveInfo(fileName):
-    SAVE_ALL_SEASONS(fileName)
-
-def loadInfo(fileName):
-    LOAD_FROM_FILE(fileName)
+        golDiff = golesLocal-golesVisitante
+        matchesArray.append([jornada, fecha, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff])
+    return matchesArray
