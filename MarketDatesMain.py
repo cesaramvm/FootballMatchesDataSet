@@ -14,11 +14,12 @@ def scrapeSelectValues(url):
     return None
 
 def parseArrayFunc(date_strings):
+    #datetime.strptime(jsonInfo.get("d"), '%d/%m/%Y').strftime('%Y-%m-%d')
     formatted_dates = [f'datetime.strptime("{date}", \'%Y-%m-%d\')' for date in date_strings]
     return ', '.join(formatted_dates)
 
 # Call the function to scrape select values
 select_values = scrapeSelectValues("https://www.transfermarkt.es/laliga-smartbank/marktwerteverein/wettbewerb/ES2/plus/")
-
+#print(select_values)
 formatted_dates = parseArrayFunc(select_values)
 print(formatted_dates)

@@ -1,6 +1,7 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 import copy
 from dataclasses import dataclass
+from datetime import datetime
 
 class Equipo:
     def __init__(self, idGlobalClub, nombre, valorActual=0):
@@ -19,32 +20,35 @@ class Equipo:
     def __repr__(self):
         return self.__str__()
 
-@dataclass
+
 class Partido:
-    idPartido: int
-    division: int
-    temporada: str
-    jornada: int
-    fecha: str
-    idLocal: int
-    localName: str
-    localMarketValue: str
-    puntosLocal: int
-    golesafavorlocal: int
-    golesencontralocal: int
-    idVisitante: int
-    visitanteName: str
-    visitanteMarketValue: str
-    puntosVisitante: int
-    golesafavorvisitante: int
-    golesencontravisitante: int
-    golesLocal: int
-    golesVisitante: int
-    golDiff: int
+
+    def __init__(self, idPartido, division, temporada, jornada, matchDate, localName, localId, localMarketValue, puntosLocal, golesafavorlocal, golesencontralocal, visitanteName, visitanteId, visitanteMarketValue, puntosVisitante, golesafavorvisitante, golesencontravisitante, golesLocal, golesVisitante, golDiff):
+        self.idPartido = int(idPartido)
+        self.division = int(division)
+        self.temporada = str(temporada)
+        self.jornada = int(jornada)
+        self.matchDate = datetime.strptime(matchDate, '%Y-%m-%d').date()
+        self.localName = str(localName)
+        self.localId = int(localId)
+        self.localMarketValue = int(localMarketValue)
+        self.puntosLocal = int(puntosLocal)
+        self.golesafavorlocal = int(golesafavorlocal)
+        self.golesencontralocal = int(golesencontralocal)
+        self.visitanteName = str(visitanteName)
+        self.visitanteId = int(visitanteId)
+        self.visitanteMarketValue = int(visitanteMarketValue)
+        self.puntosVisitante = int(puntosVisitante)
+        self.golesafavorvisitante = int(golesafavorvisitante)
+        self.golesencontravisitante = int(golesencontravisitante)
+        self.golesLocal = int(golesLocal)
+        self.golesVisitante = int(golesVisitante)
+        self.golDiff = int(golDiff)
 
     def __str__(self):
-        return "%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s::%s" \
-               % (self.idPartido, self.division, self.temporada, self.jornada, self.fecha,
-                  self.idLocal, self.localValue, self.puntosLocal, self.golesafavorlocal, self.golesencontralocal,
-                  self.idVisitante, self.visitanteValue, self.puntosVisitante, self.golesafavorvisitante, self.golesencontravisitante,
-                  self.golesLocal, self.golesVisitante, self.golDiff)
+        return (f"Partido "
+                f"{self.idPartido}::{self.division}::{self.temporada}::{self.jornada}::{self.matchDate}::"
+                f"{self.localId}::{self.localMarketValue}::{self.puntosLocal}::{self.golesafavorlocal}::{self.golesencontralocal}::"
+                f"{self.visitanteId}::{self.visitanteMarketValue}::{self.puntosVisitante}::{self.golesafavorvisitante}::{self.golesencontravisitante}::"
+                f"{self.golesLocal}::{self.golesVisitante}::{self.golDiff}")
+

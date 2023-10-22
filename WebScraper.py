@@ -1,14 +1,15 @@
 from bs4 import BeautifulSoup
 import UtilsAndGlobals as ut
 import requests, re, json
+from datetime import datetime
 
 teamsSeasonIdToGlobalId = dict()
 
-def parseSeasonData(division, temporada):
+def getKeysDictAndMatches(division, temporada):
     url = ut.URLS[division] % temporada
     req = requests.get(url)
-    return str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
-
+    parsedSeasonData = str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
+    return [getTeamsSeasonIdToGlobalIdDict(parsedSeasonData), getMatchesArray(parsedSeasonData)]
 
 def getTeamsSeasonIdToGlobalIdDict(parsedSeasonData):
     global teamsSeasonIdToGlobalId
@@ -34,7 +35,7 @@ def getMatchesArray(parsedSeasonData):
     for matchData in matches:
         jornada = re.findall(r'SP\[.*?]', matchData)[0].replace('SP[', '').replace(']', '')
         jsonInfo = json.loads(re.findall(r'\{.*\}', matchData)[0])
-        fecha = jsonInfo.get("d")
+        matchDate = datetime.strptime(jsonInfo.get("d"), '%d/%m/%Y').strftime('%Y-%m-%d')
         localGlobalId = teamsSeasonIdToGlobalId[int(jsonInfo.get("a1"))]
         localName = ut.IDs_TO_TEAM[localGlobalId]
         visitanteGlobalId = teamsSeasonIdToGlobalId[int(jsonInfo.get("a2"))]
@@ -42,5 +43,8 @@ def getMatchesArray(parsedSeasonData):
         golesLocal = int(jsonInfo.get("g1"))
         golesVisitante = int(jsonInfo.get("g2"))
         golDiff = golesLocal-golesVisitante
-        matchesArray.append([jornada, fecha, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff])
+        matchesArray.append([jornada, matchDate, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff])
     return matchesArray
+
+
+

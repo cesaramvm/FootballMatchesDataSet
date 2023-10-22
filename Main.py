@@ -1,23 +1,25 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 
-import FootballScraper as fs
 from DatosTemporada import *
 import UtilsAndGlobals as ut
+from pretty_errors import activate
+from icecream import install
+install()
 
+activate()
 
-
-def main():
+def main(divisiones, temporadas, loadFromFile):
 
     for division in divisiones:
         print("****  PROCESANDO DIVISIÓN %s ****" % division)
         for temporada in temporadas:
+            if temporada == "2022-23":
+                print("2022 2023 cuidadin")
             print("****  PROCESANDO TEMPORADA %s ****" % temporada)
             seasonData = DatosTemporada(division, temporada)
-            if division in ut.ALL_SEASONS_INFO and temporada in ut.ALL_SEASONS_INFO[division]:
-                print("FROM DATA")
-                seasonData.loadFromData()
+            if loadFromFile:
+                seasonData.loadFromFile()
             else:
-                print("FROM PARSE")
                 seasonData.loadFromScraping()
             
             #seasonData.printSeasonResults()
@@ -25,27 +27,10 @@ def main():
             ut.ADD_SEASON_INFO(division, temporada, seasonData)
 
 
-    ut.SAVE_ALL_SEASONS('TestSave.csv')
-
-temporadas = ut.LAST_TEMPORADA
+    ut.SAVE_ALL_SEASONS(ut.SAVE_FILE)
+loadFromFile = True
+temporadas = ut.ALL_TEMPORADAS
 divisiones = [2,1]
-
 ut.LOAD_MARKET_VALUES()
-ut.LOAD_ALL_SEASONS('TestSave.csv')
-
-#main()
-
-#
-# LOAD_ALL_SEASONS('DataSetPartidos.1.txt')
-
-#
-# from ScrapBDFutbol import *
-# # Obtengo los partidos de futbol de las temporadas anteriores
-# partidos = getInfo()
-# fichero = open('DataSetPartidos.all.txt', 'w')
-# fichero.write('idPartido::temporada::division::jornada::EquipoLocal::'
-#               'EquipoVisitante::golesLocal::golesVisitante::fecha::timestamp\n')
-# for value in partidos.values():
-#     fichero.write('%s\n' % str(value))
-#
-# fichero.close()
+main(divisiones, temporadas, loadFromFile)
+ut.SAVE_MARKET_VALUES()
