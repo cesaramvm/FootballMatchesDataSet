@@ -43,9 +43,13 @@ def GET_MARKET_VALUE(division, equipoName, matchDate):
                     MARKET_INFO[realMarketDate] = teamsValues
             if equipoName in MARKET_INFO[realMarketDate]:
                 return MARKET_INFO[realMarketDate][equipoName]
-                
     else:
         pass
+    with open('marketFails.txt', 'a', encoding='utf-8') as f:
+        if 'realMarketDate' in locals():
+            f.write(f"{equipoName} en el día REAL {realMarketDate}. Es de {division} división\n")
+        else:
+            f.write(f"{equipoName} en el día {matchDate}. Es de {division} división\n")
     return -1
 
 def PRINT_MARKET_VALUES():
