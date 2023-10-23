@@ -1,4 +1,4 @@
-import requests
+import requests, json, os
 from bs4 import BeautifulSoup
 from colorama import Fore, Back, Style
 import UtilsAndGlobals as ut
@@ -11,7 +11,6 @@ MARKET_INFO = {}
 
 def scrapeMarketDatesToDictionary(division):
     print(Fore.RED + f"Scraping {division}ª Market Dates"+Fore.RESET)
-    global firstMarketDate
     url = ut.MARKET_URL[division]
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',}
     response = requests.get(url, headers=headers)
@@ -20,9 +19,7 @@ def scrapeMarketDatesToDictionary(division):
         select_element = soup.find('select', {'class': 'chzn-select'})
         if select_element:
             option_values = {datetime.strptime(option['value'], "%Y-%m-%d").date(): {} for option in select_element.find_all('option')}
-            earliest_date = min(option_values)
-            if earliest_date < firstMarketDate:
-                firstMarketDate = earliest_date
+            SET_FIRST_MARKET_DATE(option_values)
             return option_values
     raise Exception("No scraping Market Dates Found")
 
@@ -58,14 +55,10 @@ def getMarketValue(division, equipoName, matchDate):
         return -1
         
     equipoName = ut.MARKET_NAMES_CORRECTION[equipoName]
-    #realMarketDate = min(MARKET_INFO[division], key=lambda sub: abs(sub - matchDate))
-    #realMarketDate = min((x for x in MARKET_INFO[division] if (x-matchDate).days <= 0), key=lambda date: abs(date - matchDate))
     realMarketDate = min(MARKET_INFO[division], key=lambda date: abs((date - matchDate) if ((date - matchDate).days)<=0 else timedelta(days=9999)))
-    #realMarketDate = min(MARKET_INFO[division], key=lambda date: abs(date - matchDate) if ((date - matchDate).days)<=0 else timedelta(days=9999))
-    if realMarketDate not in MARKET_INFO[division]:
-        
-        print("SCRAPEEEEOSCRAPEEEEOSCRAPEEEEOSCRAPEEEEOSCRAPEEEEO")
+    if not MARKET_INFO[division][realMarketDate]:
         MARKET_INFO[division][realMarketDate] = scrapeMarketValues(division, realMarketDate)
+        SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)
     if equipoName not in MARKET_INFO[division][realMarketDate]:
         return -1
         found_keys = [key for key in MARKET_INFO[realMarketDate][division].keys() if equipoName in key]
@@ -74,29 +67,36 @@ def getMarketValue(division, equipoName, matchDate):
             return MARKET_INFO[realMarketDate][division][found_keys[0]]
     return MARKET_INFO[division][realMarketDate][equipoName]
 
-  
-    return -1
-
 def printMarketValues():
     print(MARKET_INFO)
 
+import pickle
 def SAVE_MARKET_VALUES(path):
-    import json
-    with open(path, 'w') as json_obj:
-        keys_as_string = json.dumps({k.strftime("%d/%m/%Y"): MARKET_INFO[k] for k in MARKET_INFO})
-        json.dump(keys_as_string, json_obj, indent=4)
+    with open(path, 'wb') as file:
+        pickle.dump(MARKET_INFO, file)
 
 def LOAD_MARKET_VALUES(path):
-    import json
-    global MARKET_INFO
-    MARKET_INFO = {}
-    try:
-        with open(path, 'r') as load_obj:
-            a = json.loads(json.load(load_obj))
-            a = {datetime.strptime(k, '%d/%m/%Y'): a[k] for k in a}
-        MARKET_INFO=a
-    except:
-        pass
+    if os.path.exists(path):
+        global MARKET_INFO
+        with open(path, 'rb') as file:
+            loaded_dict = pickle.load(file)
+        MARKET_INFO=loaded_dict
+
+        dates = set()
+        if 1 in MARKET_INFO:
+            dates.update(MARKET_INFO[1].keys())
+        if 2 in MARKET_INFO:
+            dates.update(MARKET_INFO[2].keys())
+        SET_FIRST_MARKET_DATE(dates)
+
+def SET_FIRST_MARKET_DATE(collection):
+    global firstMarketDate
+    earliest_date = min(collection)
+    if earliest_date < firstMarketDate:
+        firstMarketDate = earliest_date
+
+    print(firstMarketDate)
+
 
 
 def SAVE_NOT_CORRECTED_NAMES():
