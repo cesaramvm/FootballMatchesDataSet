@@ -25,8 +25,8 @@ def main(divisiones, temporadas, loadFromFile):
     ut.SAVE_ALL_SEASONS(ut.SAVE_SEASONS_PATH)
 
 loadFromFile = True
-temporadas = ["2010-11"]
-divisiones = [1]
+temporadas = ut.SHORT_TEMPORADAS
+divisiones = [2,1]
 ut.LOAD_MARKET_VALUES(ut.SAVE_MARKET_PATH)
 main(divisiones, temporadas, loadFromFile)
 ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)

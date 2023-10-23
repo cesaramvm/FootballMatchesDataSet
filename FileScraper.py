@@ -32,7 +32,7 @@ def getKeysDictAndMatches(division, temporada):
 def getTeamsSeasonIdToGlobalIdDict(filteredRows):
     global teamsSeasonIdToGlobalId
     seasonIdToGlobalId = dict()
-    teamsNames = list({(d['LocalName'], d["EquipoLocalId"]) for d in filteredRows})
+    teamsNames = list({(d['localName'], d["localId"]) for d in filteredRows})
     for team in teamsNames:
         seasonTeamId = int(team[1])
         teamName = ut.CHECK_EQUIPO_NAME(team[0])
@@ -45,13 +45,17 @@ def getTeamsSeasonIdToGlobalIdDict(filteredRows):
 def getMatchesArray(filteredRows):
     global teamsSeasonIdToGlobalId
     matchesArray = []
+    # idPartido;division;temporada;jornada;matchDate;
+    # localName;localId;localMarketValue;puntosLocal;golesafavorlocal;golesencontralocal;
+    # visitanteName;visitanteId;visitanteMarketValue;puntosVisitante;golesafavorvisitante;golesencontravisitante;
+    # golesLocal;golesVisitante;golDiff
     for match in filteredRows:
         jornada = int(match["jornada"])
         matchDate = match["matchDate"]
-        localGlobalId = teamsSeasonIdToGlobalId[int(match["EquipoLocalId"])]
-        localName = match["LocalName"]
-        visitanteGlobalId = teamsSeasonIdToGlobalId[int(match["EquipoVisitanteId"])]
-        visitanteName = match["VisitanteName"]
+        localGlobalId = teamsSeasonIdToGlobalId[int(match["localId"])]
+        localName = match["localName"]
+        visitanteGlobalId = teamsSeasonIdToGlobalId[int(match["visitanteId"])]
+        visitanteName = match["visitanteName"]
         golesLocal = int(match["golesLocal"])
         golesVisitante = int(match["golesVisitante"])
         golDiff = int(match["golDiff"])
