@@ -28,7 +28,7 @@ class DatosTemporada:
 
     def loadFromFile(self):
         if not os.path.exists(ut.SAVE_SEASONS_PATH):
-            print(Fore.YELLOW + 'This text is red in color'+Fore.RESET)
+            print(Fore.YELLOW + 'LOAD FROM FILE BUT NO FILE FOUND'+Fore.RESET)
             self.loadFromScraping()
         else:
             keysDictAndMatches = fs.getKeysDictAndMatches(self.division, self.temporada)
@@ -37,6 +37,8 @@ class DatosTemporada:
 
 
     def loadEquipos(self, teamsSeasonIdToGlobalId):
+        if len(teamsSeasonIdToGlobalId) ==0:
+            raise Exception("NO HAY EQUIPOS QUE CARGAR")
         self.numJornadas = 2*(len(teamsSeasonIdToGlobalId)-1)
         for equipoId in teamsSeasonIdToGlobalId.values():
             self.clasificacion[equipoId] = 0
@@ -44,6 +46,8 @@ class DatosTemporada:
             self.golesencontra[equipoId] = 0
     
     def loadMatches(self, division, matchesArray):
+        if len(matchesArray) ==0:
+            raise Exception("NO HAY PARTIDOS QUE CARGAR")
         for match in matchesArray:
             jornada = match[0]
             matchDate = match[1]
@@ -60,11 +64,9 @@ class DatosTemporada:
         localName = ut.IDs_TO_TEAM[localGlobalId].nombre
         visitanteName = ut.IDs_TO_TEAM[visitanteGlobalId].nombre
         #print("jornada-{}, fecha-{}, local-{}-{}, visitante-{}-{}, golesLocal-{}, golesVisitante-{}".format(jornada, matchDate, localName, localGlobalId, visitanteName, visitanteGlobalId, golesLocal, golesVisitante))
-        localMarketValue = ut.GET_MARKET_VALUE(division, localName, matchDate)
-        visitanteMarketValue = ut.GET_MARKET_VALUE(division, visitanteName, matchDate)
-
-        #print(localName, matchDate.strftime("%d/%m/%Y"), localValue)
-        #print(visitanteName, matchDate.strftime("%d/%m/%Y"), visitanteValue)
+        teamsValues = ut.getTeamsMarketValue(division, matchDate, localName, visitanteName)   
+        localMarketValue = teamsValues[0]
+        visitanteMarketValue = teamsValues[1]
 
         if jornada not in self.jornadas:
             self.jornadas[jornada] = dict()

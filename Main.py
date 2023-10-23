@@ -24,7 +24,7 @@ def main(divisiones, temporadas, loadFromFile):
             ut.ADD_SEASON_INFO(division, temporada, seasonData)
     ut.SAVE_ALL_SEASONS(ut.SAVE_SEASONS_PATH)
 
-loadFromFile = True
+loadFromFile = False
 temporadas = ut.LAST_TEMPORADA
 divisiones = [2,1]
 ut.LOAD_MARKET_VALUES()
