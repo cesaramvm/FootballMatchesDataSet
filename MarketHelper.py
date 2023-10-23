@@ -88,18 +88,18 @@ def getMarketValue(division, equipoName, matchDate):
 def printMarketValues():
     print(MARKET_INFO)
 
-def SAVE_MARKET_VALUES():
+def SAVE_MARKET_VALUES(path):
     import json
-    with open(ut.SAVE_MARKET_PATH, 'w') as json_obj:
+    with open(path, 'w') as json_obj:
         keys_as_string = json.dumps({k.strftime("%d/%m/%Y"): MARKET_INFO[k] for k in MARKET_INFO})
         json.dump(keys_as_string, json_obj, indent=4)
 
-def LOAD_MARKET_VALUES():
+def LOAD_MARKET_VALUES(path):
     import json
     global MARKET_INFO
     MARKET_INFO = dict()
     try:
-        with open(ut.SAVE_MARKET_PATH, 'r') as load_obj:
+        with open(path, 'r') as load_obj:
             a = json.load(load_obj)
             """Convert the file string into a dictionary"""
             a = json.loads(a)

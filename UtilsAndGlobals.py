@@ -43,37 +43,29 @@ def ADD_SEASON_INFO(division, temporada, seasonInfo):
     if temporada not in ALL_SEASONS_INFO[division]:
         ALL_SEASONS_INFO[division][temporada] = seasonInfo
 
+
+def writeHeaders(file, headersAndAttributes):
+    file.write(';'.join(headersAndAttributes) + '\n')
+
+def writePartido(file, headersAndAttributes, partido):
+    data = ';'.join(str(getattr(partido, attr, '')) for attr in headersAndAttributes)
+    file.write(data + '\n')
+
 def SAVE_ALL_SEASONS(fileName):
-
-#     fichero = open("test.txt", 'w')
-#     fichero.write(str(ALL_SEASONS_INFO))
-#     fichero.close()
+    fichero = open(fileName, 'w', encoding="utf-8")
     
-
-    with open(fileName, 'w', encoding="utf-8") as fichero:
-        fichero.write(  'idPartido;division;temporada;jornada;matchDate;'
-                        'LocalName;EquipoLocalId;localMarketValue;PuntosClasiLocal;'
-                        'GolesAFavorLocal;GolesEnContraLocal;'
-                        'VisitanteName;EquipoVisitanteId;visitanteMarketValue;PuntosClasiVisitante;'
-                        'GolesAFavorVisitante;GolesEnContraVisitante;'
-                        'golesLocal;golesVisitante;golDiff\n')
-        for division in ALL_SEASONS_INFO:
-            for temporada in ALL_SEASONS_INFO[division]:
-                datosTemporada = ALL_SEASONS_INFO[division][temporada]
-                for jornada in datosTemporada.jornadas:
-                    partidosJornada = datosTemporada.jornadas[jornada]
-                    for partido_id, partido in partidosJornada.items():
-                        
-                        testString = "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" \
-                        % (str(partido.idPartido), str(partido.division), str(partido.temporada), str(partido.jornada), str(partido.matchDate),
-                        str(partido.localName), str(partido.localId), str(partido.localMarketValue), str(partido.puntosLocal),
-                        str(partido.golesafavorlocal), str(partido.golesencontralocal),
-                        str(partido.visitanteName), str(partido.visitanteId), str(partido.visitanteMarketValue), str(partido.puntosVisitante),
-                        str(partido.golesafavorvisitante), str(partido.golesencontravisitante),
-                        str(partido.golesLocal), str(partido.golesVisitante), str(partido.golDiff))
-                        fichero.write(testString)
-
-
-
-
+    # Define the column names for the header and partido attributes
+    headersAndAttributes = ["idPartido", "division", "temporada", "jornada", "matchDate",
+                            "localName", "localId", "localMarketValue", "puntosLocal",
+                            "golesafavorlocal", "golesencontralocal", "visitanteName", "visitanteId",
+                            "visitanteMarketValue", "puntosVisitante", "golesafavorvisitante", "golesencontravisitante",
+                            "golesLocal", "golesVisitante", "golDiff"]
+    writeHeaders(fichero, headersAndAttributes)
+    flat_partidos = [partido for division in ALL_SEASONS_INFO for temporada in ALL_SEASONS_INFO[division]
+                    for jornada in ALL_SEASONS_INFO[division][temporada].jornadas
+                    for partido in ALL_SEASONS_INFO[division][temporada].jornadas[jornada].values()]
     
+    for partido in flat_partidos:
+        writePartido(fichero, headersAndAttributes, partido)
+
+    fichero.close()
