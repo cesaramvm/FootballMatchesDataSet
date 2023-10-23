@@ -15,7 +15,7 @@ class WebScraper:
         return str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
 
     def getTeamsSeasonIdToGlobalIdDict(self):
-        seasonIdToGlobalId = dict()
+        seasonIdToGlobalId = {}
         match = re.findall(r'SE\[\d{0,100}\]=\".*?\";', self.data)
         for mat in match:
             mat = re.sub(r'SE.*?="', '', mat)

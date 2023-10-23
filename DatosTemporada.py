@@ -15,10 +15,10 @@ class DatosTemporada:
         temporadaAñoStart = int(temporada.split("-")[0])
         self.puntosPorVictoria = 3 if temporadaAñoStart > 1994 else 2
 
-        self.clasificacion = dict()
-        self.golesafavor = dict()
-        self.golesencontra = dict()
-        self.jornadas = dict()
+        self.clasificacion = {}
+        self.golesafavor = {}
+        self.golesencontra = {}
+        self.jornadas = {}
 
         self.loadEquipos()
         self.loadMatches()
@@ -55,9 +55,7 @@ class DatosTemporada:
         teamsValues = ut.getTeamsMarketValue(division, matchDate, localName, visitanteName)   
         localMarketValue = teamsValues[0]
         visitanteMarketValue = teamsValues[1]
-
-        if jornada not in self.jornadas:
-            self.jornadas[jornada] = dict()
+        ut.CHECK_KEY_EXISTANCE(jornada, self.jornadas, {})
         self.jornadas[jornada][ut.CURRENT_MATCH_ID] = fc.Partido(ut.CURRENT_MATCH_ID, self.division, self.temporada, jornada, matchDate,
                                                             localName, localGlobalId, localMarketValue, self.clasificacion[localGlobalId],
                                                             self.golesafavor[localGlobalId], self.golesencontra[localGlobalId],

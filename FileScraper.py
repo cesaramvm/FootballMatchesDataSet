@@ -20,7 +20,7 @@ class FileScraper:
         return filteredRows
 
     def getTeamsSeasonIdToGlobalIdDict(self):
-        seasonIdToGlobalId = dict()
+        seasonIdToGlobalId = {}
         teamsNames = list({(d['localName'], d["localId"]) for d in self.data})
         for team in teamsNames:
             seasonTeamId = int(team[1])

@@ -2,11 +2,12 @@
 
 from DatosTemporada import *
 import UtilsAndGlobals as ut
-from pretty_errors import activate
+#from pretty_errors import activate
 from icecream import install
 from colorama import Fore, Back, Style
+import MarketHelper as mh
 install()
-activate()
+#activate()
 
 def main(divisiones, temporadas, loadFromFile):
     for division in divisiones:
@@ -22,8 +23,10 @@ def main(divisiones, temporadas, loadFromFile):
     ut.SAVE_ALL_SEASONS(ut.SAVE_SEASONS_PATH)
 
 loadFromFile = True
-temporadas = ut.SHORT_TEMPORADAS
+temporadas = ut.ALL_TEMPORADAS
 divisiones = [2,1]
-ut.LOAD_MARKET_VALUES(ut.SAVE_MARKET_PATH)
+#ut.LOAD_MARKET_VALUES(ut.SAVE_MARKET_PATH)
 main(divisiones, temporadas, loadFromFile)
 ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)
+
+mh.SAVE_NOT_CORRECTED_NAMES()

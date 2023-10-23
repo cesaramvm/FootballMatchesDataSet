@@ -9,14 +9,23 @@ from colorama import Fore, Back, Style
 
 CURRENT_MATCH_ID = 1
 CURRENT_TEAM_ID = 1
-TEAM_NAMES_TO_ID = dict()
-IDs_TO_TEAM = dict()
+TEAM_NAMES_TO_ID = {}
+IDs_TO_TEAM = {}
 SAVE_SEASONS_PATH = 'TestSave.csv'
 SAVE_MARKET_PATH = 'market_values.json'
-ALL_SEASONS_INFO = dict()
+ALL_SEASONS_INFO = {}
+
+def CHECK_KEY_EXISTANCE(key, collection, newElement):
+    if not key in collection:
+        if callable(newElement):
+            collection[key] = newElement()
+        else:
+            collection[key] = newElement
+        return False
+    return True
 
 def CHECK_EQUIPO_ID(equipoName):
-        if not equipoName in TEAM_NAMES_TO_ID:
+        if equipoName not in TEAM_NAMES_TO_ID:
             global CURRENT_TEAM_ID
             TEAM_NAMES_TO_ID[equipoName] = CURRENT_TEAM_ID
             equipo = fc.Equipo(CURRENT_TEAM_ID, equipoName)
@@ -38,16 +47,14 @@ def CHECK_EQUIPO_NAME(equipo):
 
 
 def ADD_SEASON_INFO(division, temporada, seasonInfo):
-    if division not in ALL_SEASONS_INFO:
-        ALL_SEASONS_INFO[division] = dict()
-    if temporada not in ALL_SEASONS_INFO[division]:
-        ALL_SEASONS_INFO[division][temporada] = seasonInfo
+    ut.CHECK_KEY_EXISTANCE(division, ALL_SEASONS_INFO, {})
+    ut.CHECK_KEY_EXISTANCE(temporada, ALL_SEASONS_INFO[division], seasonInfo)
 
 
-def writeHeaders(file, headersAndAttributes):
+def _writeHeaders(file, headersAndAttributes):
     file.write(';'.join(headersAndAttributes) + '\n')
 
-def writePartido(file, headersAndAttributes, partido):
+def _writePartido(file, headersAndAttributes, partido):
     data = ';'.join(str(getattr(partido, attr, '')) for attr in headersAndAttributes)
     file.write(data + '\n')
 
@@ -60,12 +67,12 @@ def SAVE_ALL_SEASONS(fileName):
                             "golesafavorlocal", "golesencontralocal", "visitanteName", "visitanteId",
                             "visitanteMarketValue", "puntosVisitante", "golesafavorvisitante", "golesencontravisitante",
                             "golesLocal", "golesVisitante", "golDiff"]
-    writeHeaders(fichero, headersAndAttributes)
+    _writeHeaders(fichero, headersAndAttributes)
     flat_partidos = [partido for division in ALL_SEASONS_INFO for temporada in ALL_SEASONS_INFO[division]
                     for jornada in ALL_SEASONS_INFO[division][temporada].jornadas
                     for partido in ALL_SEASONS_INFO[division][temporada].jornadas[jornada].values()]
     
     for partido in flat_partidos:
-        writePartido(fichero, headersAndAttributes, partido)
+        _writePartido(fichero, headersAndAttributes, partido)
 
     fichero.close()
