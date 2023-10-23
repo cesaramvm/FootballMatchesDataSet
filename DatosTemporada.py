@@ -1,14 +1,14 @@
 import FootballClasses as fc
 import UtilsAndGlobals as ut
-import FileScraper as fs
-import WebScraper as ws
+from FileScraper import FileScraper 
+from WebScraper import WebScraper
 import os
 from colorama import Fore, Back, Style
 
 class DatosTemporada:
 
     def __init__(self, division, temporada, loadFromFile):
-        self.seasonLoader = fs if loadFromFile else ws
+        self.seasonLoader = FileScraper(division, temporada) if loadFromFile else WebScraper(division, temporada)
         self.division = division
         self.temporada = temporada
 
@@ -20,41 +20,23 @@ class DatosTemporada:
         self.golesencontra = dict()
         self.jornadas = dict()
 
-        self.loadData()
-
-
-    # def loadFromScraping(self):
-    #     keysDictAndMatches = ws.getKeysDictAndMatches(self.division, self.temporada)
-    #     self.loadEquipos(keysDictAndMatches[0])
-    #     self.loadMatches(self.division, keysDictAndMatches[1])
-
-    # def loadFromFile(self):
-    #     if not os.path.exists(ut.SAVE_SEASONS_PATH):
-    #         print(Fore.YELLOW + 'LOAD FROM FILE BUT NO FILE FOUND'+Fore.RESET)
-    #         self.loadFromScraping()
-    #     else:
-    #         keysDictAndMatches = fs.getKeysDictAndMatches(self.division, self.temporada)
-    #         self.loadEquipos(keysDictAndMatches[0])
-    #         self.loadMatches(self.division, keysDictAndMatches[1])
+        self.loadEquipos()
+        self.loadMatches()
     
-    def loadData(self):
-        keysDictAndMatches = self.seasonLoader.getKeysDictAndMatches(self.division, self.temporada)
-        self.loadEquipos(keysDictAndMatches[0])
-        self.loadMatches(self.division, keysDictAndMatches[1])
 
-    def loadEquipos(self, teamsSeasonIdToGlobalId):
-        if len(teamsSeasonIdToGlobalId) ==0:
+    def loadEquipos(self):
+        if len(self.seasonLoader.teamsSeasonIdToGlobalIdDict) ==0:
             raise Exception("NO HAY EQUIPOS QUE CARGAR")
-        self.numJornadas = 2*(len(teamsSeasonIdToGlobalId)-1)
-        for equipoId in teamsSeasonIdToGlobalId.values():
+        self.numJornadas = 2*(len(self.seasonLoader.teamsSeasonIdToGlobalIdDict)-1)
+        for equipoId in self.seasonLoader.teamsSeasonIdToGlobalIdDict.values():
             self.clasificacion[equipoId] = 0
             self.golesafavor[equipoId] = 0
             self.golesencontra[equipoId] = 0
     
-    def loadMatches(self, division, matchesArray):
-        if len(matchesArray) ==0:
+    def loadMatches(self):
+        if len(self.seasonLoader.matchesArray) ==0:
             raise Exception("NO HAY PARTIDOS QUE CARGAR")
-        for match in matchesArray:
+        for match in self.seasonLoader.matchesArray:
             jornada = match[0]
             matchDate = match[1]
             localGlobalId = match[2]
@@ -64,7 +46,7 @@ class DatosTemporada:
             golesLocal = match[6]
             golesVisitante = match[7]
             golDiff = match[8]
-            self.addMatch(division, jornada, matchDate, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff)
+            self.addMatch(self.division, jornada, matchDate, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff)
 
     def addMatch(self, division, jornada, matchDate, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff):
         localName = ut.IDs_TO_TEAM[localGlobalId].nombre
