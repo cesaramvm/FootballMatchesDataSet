@@ -1,8 +1,8 @@
-from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+from colorama import Fore, Back, Style
 
-def scrapeSelectValues(url):
+def scrapeMarketDates(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',}
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
@@ -19,7 +19,7 @@ def parseArrayFunc(date_strings):
     return ', '.join(formatted_dates)
 
 # Call the function to scrape select values
-select_values = scrapeSelectValues("https://www.transfermarkt.es/laliga-smartbank/marktwerteverein/wettbewerb/ES2/plus/")
+select_values = scrapeMarketDates("https://www.transfermarkt.es/laliga-smartbank/marktwerteverein/wettbewerb/ES2/plus/")
 #print(select_values)
 formatted_dates = parseArrayFunc(select_values)
 print(formatted_dates)

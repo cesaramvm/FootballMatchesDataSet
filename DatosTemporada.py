@@ -3,6 +3,9 @@ import FootballClasses as fc
 import UtilsAndGlobals as ut
 import FileScraper as fs
 from datetime import datetime
+import os
+from colorama import Fore, Back, Style
+
 class DatosTemporada:
 
     def __init__(self, division, temporada):
@@ -24,9 +27,13 @@ class DatosTemporada:
         self.loadMatches(self.division, keysDictAndMatches[1])
 
     def loadFromFile(self):
-        keysDictAndMatches = fs.getKeysDictAndMatches(self.division, self.temporada)
-        self.loadEquipos(keysDictAndMatches[0])
-        self.loadMatches(self.division, keysDictAndMatches[1])
+        if not os.path.exists(ut.SAVE_SEASONS_PATH):
+            print(Fore.YELLOW + 'This text is red in color'+Fore.RESET)
+            self.loadFromScraping()
+        else:
+            keysDictAndMatches = fs.getKeysDictAndMatches(self.division, self.temporada)
+            self.loadEquipos(keysDictAndMatches[0])
+            self.loadMatches(self.division, keysDictAndMatches[1])
 
 
     def loadEquipos(self, teamsSeasonIdToGlobalId):

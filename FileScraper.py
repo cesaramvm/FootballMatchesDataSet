@@ -13,7 +13,7 @@ teamsSeasonIdToGlobalId = dict()
 def filterData(division, temporada):
     filteredRows = []
     # Open the CSV file and read it row by row
-    with open(ut.SAVE_FILE, 'r', encoding="utf-8") as csvfile:
+    with open(ut.SAVE_SEASONS_PATH, 'r', encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile, delimiter=';')
         for row in reader:
             rowDivision = int(row['division'])
