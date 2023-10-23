@@ -1,14 +1,14 @@
-import WebScraper as ws
 import FootballClasses as fc
 import UtilsAndGlobals as ut
 import FileScraper as fs
-from datetime import datetime
+import WebScraper as ws
 import os
 from colorama import Fore, Back, Style
 
 class DatosTemporada:
 
-    def __init__(self, division, temporada):
+    def __init__(self, division, temporada, loadFromFile):
+        self.seasonLoader = fs if loadFromFile else ws
         self.division = division
         self.temporada = temporada
 
@@ -20,21 +20,27 @@ class DatosTemporada:
         self.golesencontra = dict()
         self.jornadas = dict()
 
+        self.loadData()
 
-    def loadFromScraping(self):
-        keysDictAndMatches = ws.getKeysDictAndMatches(self.division, self.temporada)
+
+    # def loadFromScraping(self):
+    #     keysDictAndMatches = ws.getKeysDictAndMatches(self.division, self.temporada)
+    #     self.loadEquipos(keysDictAndMatches[0])
+    #     self.loadMatches(self.division, keysDictAndMatches[1])
+
+    # def loadFromFile(self):
+    #     if not os.path.exists(ut.SAVE_SEASONS_PATH):
+    #         print(Fore.YELLOW + 'LOAD FROM FILE BUT NO FILE FOUND'+Fore.RESET)
+    #         self.loadFromScraping()
+    #     else:
+    #         keysDictAndMatches = fs.getKeysDictAndMatches(self.division, self.temporada)
+    #         self.loadEquipos(keysDictAndMatches[0])
+    #         self.loadMatches(self.division, keysDictAndMatches[1])
+    
+    def loadData(self):
+        keysDictAndMatches = self.seasonLoader.getKeysDictAndMatches(self.division, self.temporada)
         self.loadEquipos(keysDictAndMatches[0])
         self.loadMatches(self.division, keysDictAndMatches[1])
-
-    def loadFromFile(self):
-        if not os.path.exists(ut.SAVE_SEASONS_PATH):
-            print(Fore.YELLOW + 'LOAD FROM FILE BUT NO FILE FOUND'+Fore.RESET)
-            self.loadFromScraping()
-        else:
-            keysDictAndMatches = fs.getKeysDictAndMatches(self.division, self.temporada)
-            self.loadEquipos(keysDictAndMatches[0])
-            self.loadMatches(self.division, keysDictAndMatches[1])
-
 
     def loadEquipos(self, teamsSeasonIdToGlobalId):
         if len(teamsSeasonIdToGlobalId) ==0:

@@ -1,14 +1,8 @@
 import UtilsAndGlobals as ut
 import csv
 
-teamsSeasonIdToGlobalId = dict()
-    
-    # with open(ut.SAVE_FILE, 'r') as file:
-    #     next(file)
-    #     filtered_rows = []
-    #     for line in file:
-    #         parts = line.strip().split(';')
 
+teamsSeasonIdToGlobalId = dict()
 
 def filterData(division, temporada):
     filteredRows = []

@@ -8,8 +8,6 @@ from colorama import Fore, Back, Style
 install()
 activate()
 
-
-
 def main(divisiones, temporadas, loadFromFile):
     for division in divisiones:
         print("****  PROCESANDO DIVISIÓN %s ****" % division)
@@ -17,8 +15,7 @@ def main(divisiones, temporadas, loadFromFile):
             if temporada == "2022-23":
                 print(Fore.RED + "****  2022 2023 cuidadin ****"+Fore.RESET)
             print("****  PROCESANDO TEMPORADA %s ****" % temporada)
-            seasonData = DatosTemporada(division, temporada)
-            seasonData.loadFromFile() if loadFromFile else seasonData.loadFromScraping()
+            seasonData = DatosTemporada(division, temporada, loadFromFile)
             #seasonData.printSeasonResults()
             seasonData.printSeasonWinner()
             ut.ADD_SEASON_INFO(division, temporada, seasonData)
