@@ -36,15 +36,12 @@ def CHECK_EQUIPO_ID(equipoName):
             globalEquipoId = TEAM_NAMES_TO_ID[equipoName]
         return globalEquipoId
 
-
-# Funcion para sustituir el nombre de los equipos y unificarlos
 def CHECK_EQUIPO_NAME(equipo):
     if equipo not in NAMES_CORRECTION:
         raise Exception(f"{equipo} no está en la corrección")
     else:
         equipo = NAMES_CORRECTION[equipo]
     return equipo
-
 
 def ADD_SEASON_INFO(division, temporada, seasonInfo):
     ut.CHECK_KEY_EXISTANCE(division, ALL_SEASONS_INFO, {})
@@ -61,7 +58,6 @@ def _writePartido(file, headersAndAttributes, partido):
 def SAVE_ALL_SEASONS(fileName):
     fichero = open(fileName, 'w', encoding="utf-8")
     
-    # Define the column names for the header and partido attributes
     headersAndAttributes = ["idPartido", "division", "temporada", "jornada", "matchDate",
                             "localName", "localId", "localMarketValue", "puntosLocal",
                             "golesafavorlocal", "golesencontralocal", "visitanteName", "visitanteId",

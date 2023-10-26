@@ -1,4 +1,4 @@
-import requests, json, os
+import requests, json, os, pickle
 from bs4 import BeautifulSoup
 from colorama import Fore, Back, Style
 import UtilsAndGlobals as ut
@@ -74,20 +74,28 @@ def getMarketValue(division, equipoName, matchDate):
             notInMarketTeams.add(equipoName)
             return -1
         else:
+            if not found_keys:
+                found_keys = found_keys2
+                division = backupDivision
             print(f"equipoName:{equipoName} foundkeys: {found_keys} in div: {division}")
-            print(f"equipoName:{equipoName} foundkeys: {found_keys2} in div: {backupDivision}")
         backupEquipoName = equipoName
-        equipoName = found_keys[0] if len(found_keys)>0 else found_keys2[0]
+        equipoName = found_keys[0]
         print(f"oldequipoName:{backupEquipoName} - new equipoName:{equipoName} ")
     return MARKET_INFO[division][realMarketDate][equipoName]
 
-def printMarketValues():
-    print(MARKET_INFO)
+def SET_FIRST_MARKET_DATE(collection):
+    global firstMarketDate
+    earliest_date = min(collection)
+    if earliest_date < firstMarketDate:
+        firstMarketDate = earliest_date
 
-import pickle
 def SAVE_MARKET_VALUES(path):
     with open(path, 'wb') as file:
         pickle.dump(MARKET_INFO, file)
+    with open('uncorrectedMarketNames.txt', 'w', encoding='utf-8') as f:
+        f.write(f"{notInCorrectionTeams}")
+    with open('notInMarketNames.txt', 'w', encoding='utf-8') as f:
+        f.write(f"{notInMarketTeams}")
 
 def LOAD_MARKET_VALUES(path):
     if os.path.exists(path):
@@ -102,18 +110,3 @@ def LOAD_MARKET_VALUES(path):
         if 2 in MARKET_INFO:
             dates.update(MARKET_INFO[2].keys())
         SET_FIRST_MARKET_DATE(dates)
-
-def SET_FIRST_MARKET_DATE(collection):
-    global firstMarketDate
-    earliest_date = min(collection)
-    if earliest_date < firstMarketDate:
-        firstMarketDate = earliest_date
-
-def SAVE_NOT_CORRECTED_NAMES():
-    with open('uncorrectedMarketNames.txt', 'w', encoding='utf-8') as f:
-        f.write(f"{notInCorrectionTeams}")
-
-
-def SAVE_NOT_IN_MARKET_NAMES():
-    with open('notInMarketNames.txt', 'w', encoding='utf-8') as f:
-        f.write(f"{notInCorrectionTeams}")

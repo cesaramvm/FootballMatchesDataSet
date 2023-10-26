@@ -18,14 +18,11 @@ def main(divisiones, temporadas, loadFromFile):
             #seasonData.printSeasonResults()
             seasonData.printSeasonWinner()
             ut.ADD_SEASON_INFO(division, temporada, seasonData)
-            ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)
 
-loadFromFile = False
+loadFromFile = True
 temporadas = ut.ALL_TEMPORADAS
 divisiones = [2,1]
 ut.LOAD_MARKET_VALUES(ut.SAVE_MARKET_PATH)
 main(divisiones, temporadas, loadFromFile)
 ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)
 ut.SAVE_ALL_SEASONS(ut.SAVE_SEASONS_PATH)
-mh.SAVE_NOT_CORRECTED_NAMES()
-mh.SAVE_NOT_IN_MARKET_NAMES()
