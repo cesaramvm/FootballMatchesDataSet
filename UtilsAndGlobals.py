@@ -14,6 +14,7 @@ IDs_TO_TEAM = {}
 SAVE_SEASONS_PATH = 'TestSave.csv'
 SAVE_MARKET_PATH = 'market_values.json'
 ALL_SEASONS_INFO = {}
+SEASON_MATCHES_REFEREES = {}
 
 def CHECK_KEY_EXISTANCE(key, collection, newElement):
     if not key in collection:

@@ -10,7 +10,8 @@ class WebScraper:
         self.matchesArray = self.getMatchesArray()
 
     def filterData(self, division, temporada):
-        url = ut.URLS[division] % temporada
+        divisionString = "" if division == 1 else "2a"
+        url = ut.SEASON_URL % (temporada,divisionString)
         req = requests.get(url)
         return str(BeautifulSoup(req.text, "html.parser").find('div', {'id': 'resultats'}))
 

@@ -12,7 +12,7 @@ MARKET_INFO = {}
 
 def scrapeMarketDatesToDictionary(division):
     print(Fore.RED + f"Scraping {division}ª Market Dates"+Fore.RESET)
-    url = ut.MARKET_URL[division]
+    url = ut.MARKET_URL % (division,"")
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',}
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
@@ -27,7 +27,7 @@ def scrapeMarketDatesToDictionary(division):
 def scrapeMarketTeamValues(division, realMarketDate):
     print(Fore.MAGENTA + f"Scraping {division}ª Market Values ON {realMarketDate}"+Fore.RESET)
     teamsValues = {}
-    marketUrl = ut.MARKET_URL[division] % realMarketDate.strftime("%Y-%m-%d")
+    marketUrl = ut.MARKET_URL % (division, realMarketDate.strftime("%Y-%m-%d"))
     req = requests.get(marketUrl, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.9999.999 Safari/537.36'})
 
     localMarketNodes = BeautifulSoup(req.text, "html.parser").find_all('td', {'class': 'hauptlink no-border-links'})
@@ -51,10 +51,10 @@ def getMarketValue(division, equipoName, matchDate):
     matchDate = datetime.strptime(matchDate, '%Y-%m-%d').date()
     if matchDate < firstMarketDate:
         return -1
-    if equipoName not in ut.MARKET_NAMES_CORRECTION:
+    if equipoName not in ut.TRANSFERMARKT_NAMES_CORRECTION:
         notInCorrectionTeams.add(equipoName)
     else:
-        equipoName = ut.MARKET_NAMES_CORRECTION[equipoName]
+        equipoName = ut.TRANSFERMARKT_NAMES_CORRECTION[equipoName]
     realMarketDate = min(MARKET_INFO[division], key=lambda date: abs((date - matchDate) if ((date - matchDate).days)<=0 else timedelta(days=9999)))
     if not MARKET_INFO[division][realMarketDate]:
         MARKET_INFO[division][realMarketDate] = scrapeMarketTeamValues(division, realMarketDate)
