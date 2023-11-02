@@ -1,5 +1,4 @@
-import FootballClasses as fc
-import UtilsAndGlobals as ut
+import FootballClasses as fc,  UtilsAndGlobals as ut
 from FileScraper import FileScraper 
 from WebScraper import WebScraper
 import os
@@ -7,13 +6,13 @@ from colorama import Fore, Back, Style
 
 class DatosTemporada:
 
-    def __init__(self, division, temporada, loadFromFile):
-        self.seasonLoader = FileScraper(division, temporada) if loadFromFile else WebScraper(division, temporada)
+    def __init__(self, division, temporada):
+        self.seasonLoader = FileScraper(division, temporada) if ut.loadFromFile else WebScraper(division, temporada)
         self.division = division
         self.temporada = temporada
 
-        temporadaAñoStart = int(temporada.split("-")[0])
-        self.puntosPorVictoria = 3 if temporadaAñoStart > 1994 else 2
+        self.temporadaAñoStart = int(temporada.split("-")[0])
+        self.puntosPorVictoria = 3 if self.temporadaAñoStart > 1994 else 2
 
         self.clasificacion = {}
         self.golesafavor = {}
@@ -25,8 +24,7 @@ class DatosTemporada:
     
 
     def loadEquipos(self):
-        if len(self.seasonLoader.teamsSeasonIdToGlobalIdDict) ==0:
-            raise Exception("NO HAY EQUIPOS QUE CARGAR")
+        ut.RAISE_IF(not self.seasonLoader.teamsSeasonIdToGlobalIdDict, "NO HAY EQUIPOS QUE CARGAR")
         self.numJornadas = 2*(len(self.seasonLoader.teamsSeasonIdToGlobalIdDict)-1)
         for equipoId in self.seasonLoader.teamsSeasonIdToGlobalIdDict.values():
             self.clasificacion[equipoId] = 0
@@ -34,8 +32,7 @@ class DatosTemporada:
             self.golesencontra[equipoId] = 0
     
     def loadMatches(self):
-        if len(self.seasonLoader.matchesArray) ==0:
-            raise Exception("NO HAY PARTIDOS QUE CARGAR")
+        ut.RAISE_IF(not self.seasonLoader.matchesArray, "NO HAY PARTIDOS QUE CARGAR")
         for match in self.seasonLoader.matchesArray:
             jornada = match[0]
             matchDate = match[1]
@@ -52,11 +49,15 @@ class DatosTemporada:
         localName = ut.IDs_TO_TEAM[localGlobalId].nombre
         visitanteName = ut.IDs_TO_TEAM[visitanteGlobalId].nombre
         #print("jornada-{}, fecha-{}, local-{}-{}, visitante-{}-{}, golesLocal-{}, golesVisitante-{}".format(jornada, matchDate, localName, localGlobalId, visitanteName, visitanteGlobalId, golesLocal, golesVisitante))
-        teamsValues = ut.getTeamsMarketValue(division, matchDate, localName, visitanteName)   
+        teamsValues = ut.marketHelper.getTeamsMarketValue(division, matchDate, localName, visitanteName)   
         localMarketValue = teamsValues[0]
         visitanteMarketValue = teamsValues[1]
         ut.CHECK_KEY_EXISTANCE(jornada, self.jornadas, {})
-        self.jornadas[jornada][ut.CURRENT_MATCH_ID] = fc.Partido(ut.CURRENT_MATCH_ID, self.division, self.temporada, jornada, matchDate,
+        arbitroId = -1
+        arbitroName = ""
+        (arbitroName, arbitroId, resultado) = ut.refereesHelper.getMatchRefereeAndResults(self.temporadaAñoStart, self.division, localGlobalId, visitanteGlobalId)
+
+        self.jornadas[jornada][ut.CURRENT_MATCH_ID] = fc.Partido(ut.CURRENT_MATCH_ID, self.division, self.temporada, jornada, matchDate, arbitroName, arbitroId,
                                                             localName, localGlobalId, localMarketValue, self.clasificacion[localGlobalId],
                                                             self.golesafavor[localGlobalId], self.golesencontra[localGlobalId],
                                                             visitanteName, visitanteGlobalId, visitanteMarketValue,self.clasificacion[visitanteGlobalId],
@@ -81,7 +82,7 @@ class DatosTemporada:
     def printSeasonResults(self):
         clasiOrdenada = {k: v for k, v in sorted(self.clasificacion.items(), reverse=True, key=lambda item: item[1])}
         iteration = iter(clasiOrdenada)
-        for i in range(1,4):
+        for _ in range(3):
             equipoId = next(iteration)
             puntosEquipo = str(ut.IDs_TO_TEAM[equipoId]) + " " + str(self.clasificacion[equipoId])
             print(puntosEquipo)
@@ -100,4 +101,3 @@ class DatosTemporada:
             print("EMPATE: GANADOR->",ut.IDs_TO_TEAM[teamID])
         else:
             print(ut.IDs_TO_TEAM[equiposGanadores[0]])
-

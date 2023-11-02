@@ -23,12 +23,14 @@ class Equipo:
 
 class Partido:
 
-    def __init__(self, idPartido, division, temporada, jornada, matchDate, localName, localId, localMarketValue, puntosLocal, golesafavorlocal, golesencontralocal, visitanteName, visitanteId, visitanteMarketValue, puntosVisitante, golesafavorvisitante, golesencontravisitante, golesLocal, golesVisitante, golDiff):
+    def __init__(self, idPartido, division, temporada, jornada, matchDate, arbitroName, arbitroId, localName, localId, localMarketValue, puntosLocal, golesafavorlocal, golesencontralocal, visitanteName, visitanteId, visitanteMarketValue, puntosVisitante, golesafavorvisitante, golesencontravisitante, golesLocal, golesVisitante, golDiff):
         self.idPartido = int(idPartido)
         self.division = int(division)
         self.temporada = str(temporada)
         self.jornada = int(jornada)
         self.matchDate = datetime.strptime(matchDate, '%Y-%m-%d').date()
+        self.arbitroName = arbitroName
+        self.arbitroId = arbitroId
         self.localName = str(localName)
         self.localId = int(localId)
         self.localMarketValue = int(localMarketValue)
@@ -47,7 +49,7 @@ class Partido:
 
     def __str__(self):
         return (f"Partido "
-                f"{self.idPartido}::{self.division}::{self.temporada}::{self.jornada}::{self.matchDate}::"
+                f"{self.idPartido}::{self.division}::{self.temporada}::{self.jornada}::{self.matchDate}::{self.arbitroName}::{self.arbitroId}::"
                 f"{self.localId}::{self.localMarketValue}::{self.puntosLocal}::{self.golesafavorlocal}::{self.golesencontralocal}::"
                 f"{self.visitanteId}::{self.visitanteMarketValue}::{self.puntosVisitante}::{self.golesafavorvisitante}::{self.golesencontravisitante}::"
                 f"{self.golesLocal}::{self.golesVisitante}::{self.golDiff}")

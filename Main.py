@@ -1,7 +1,8 @@
 #Autor original Ricardo Moya https://github.com/RicardoMoya/FootballMatchesDataSet
 
-from DatosTemporada import *
 import UtilsAndGlobals as ut
+from DatosTemporada import DatosTemporada
+
 #from pretty_errors import activate
 from icecream import install
 from colorama import Fore, Back, Style
@@ -9,20 +10,26 @@ import MarketHelper as mh
 install()
 #activate()
 
-def main(divisiones, temporadas, loadFromFile):
+def main():
+    ut.loadFromFile = True
+    ut.loadMarket = True
+    ut.loadReferees = True
+    temporadas = ut.ALL_TEMPORADAS
+    divisiones = [2,1]
     for division in divisiones:
         print("****  PROCESANDO DIVISIÓN %s ****" % division)
         for temporada in temporadas:
             print("****  PROCESANDO TEMPORADA %s ****" % temporada)
-            seasonData = DatosTemporada(division, temporada, loadFromFile)
+            seasonData = DatosTemporada(division, temporada)
             #seasonData.printSeasonResults()
             seasonData.printSeasonWinner()
-            ut.ADD_SEASON_INFO(division, temporada, seasonData)
+            ut.ADD_SEASON_INFO(division, temporada, seasonData)        
+            ut.SAVENOTTRANSFER()
 
-loadFromFile = True
-temporadas = ut.ALL_TEMPORADAS
-divisiones = [2,1]
-ut.LOAD_MARKET_VALUES(ut.SAVE_MARKET_PATH)
-main(divisiones, temporadas, loadFromFile)
-ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)
-ut.SAVE_ALL_SEASONS(ut.SAVE_SEASONS_PATH)
+    ut.SAVE_REFEREES_VALUES(ut.SAVE_REFEREES_PATH)
+    ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)
+    ut.SAVE_ALL_SEASONS(ut.SAVE_SEASONS_PATH)
+
+
+main()
+
