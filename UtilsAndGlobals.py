@@ -41,7 +41,7 @@ def GET_GLOBAL_EQUIPO_ID_FROM_TRANSFERMARKT_NAME(equipoName, alternateEquipoName
         raise ValueError("Multiple equipo IDs found for {} - {}: {}".format(equipoName, alternateEquipoName, str(arrayIds)))
     else:
         equipoId = uniqueIds.pop()
-        print("Single equipo ID:", equipoId)
+        print("Name: {} - single equipo ID:{} ".format(equipoName,equipoId))
         return equipoId
     
 def SAVENOTTRANSFER():

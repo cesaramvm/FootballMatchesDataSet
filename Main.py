@@ -14,7 +14,11 @@ def main():
     ut.loadFromFile = True
     ut.loadMarket = True
     ut.loadReferees = True
-    temporadas = ut.ALL_TEMPORADAS
+    ut.loadFromFile = not ut.loadFromFile
+    ut.loadMarket = not ut.loadMarket
+    ut.loadReferees = not ut.loadReferees
+
+    temporadas = ut.SHORT_TEMPORADAS
     divisiones = [2,1]
     for division in divisiones:
         print("****  PROCESANDO DIVISIÓN %s ****" % division)
@@ -25,6 +29,7 @@ def main():
             seasonData.printSeasonWinner()
             ut.ADD_SEASON_INFO(division, temporada, seasonData)        
             ut.SAVENOTTRANSFER()
+            ut.SAVE_REFEREES_VALUES(ut.SAVE_REFEREES_PATH)
 
     ut.SAVE_REFEREES_VALUES(ut.SAVE_REFEREES_PATH)
     ut.SAVE_MARKET_VALUES(ut.SAVE_MARKET_PATH)

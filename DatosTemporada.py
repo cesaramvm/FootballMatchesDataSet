@@ -48,15 +48,15 @@ class DatosTemporada:
     def addMatch(self, division, jornada, matchDate, localGlobalId, localName, visitanteGlobalId, visitanteName, golesLocal, golesVisitante,golDiff):
         localName = ut.IDs_TO_TEAM[localGlobalId].nombre
         visitanteName = ut.IDs_TO_TEAM[visitanteGlobalId].nombre
-        #print("jornada-{}, fecha-{}, local-{}-{}, visitante-{}-{}, golesLocal-{}, golesVisitante-{}".format(jornada, matchDate, localName, localGlobalId, visitanteName, visitanteGlobalId, golesLocal, golesVisitante))
-        teamsValues = ut.marketHelper.getTeamsMarketValue(division, matchDate, localName, visitanteName)   
-        localMarketValue = teamsValues[0]
-        visitanteMarketValue = teamsValues[1]
-        ut.CHECK_KEY_EXISTANCE(jornada, self.jornadas, {})
+        print("jornada-{}, fecha-{}, local-{}-{}, visitante-{}-{}, golesLocal-{}, golesVisitante-{}".format(jornada, matchDate, localName, localGlobalId, visitanteName, visitanteGlobalId, golesLocal, golesVisitante))
+        (localMarketValue, visitanteMarketValue) = ut.marketHelper.getTeamsMarketValue(division, matchDate, localName, visitanteName)   
         arbitroId = -1
         arbitroName = ""
-        (arbitroName, arbitroId, resultado) = ut.refereesHelper.getMatchRefereeAndResults(self.temporadaAñoStart, self.division, localGlobalId, visitanteGlobalId)
-
+        (arbitroName, arbitroId, resultadoArbitros) = ut.refereesHelper.getMatchRefereeAndResults(self.temporadaAñoStart, self.division, localGlobalId, visitanteGlobalId)
+        if arbitroId and (int(resultadoArbitros.split(":")[0]) != golesLocal or int(resultadoArbitros.split(":")[1]) != golesVisitante):
+                raise ValueError("EN ESTE PARTIDO NO ME CUADRAN LOS GOLES")
+            
+        ut.CHECK_KEY_EXISTANCE(jornada, self.jornadas, {})
         self.jornadas[jornada][ut.CURRENT_MATCH_ID] = fc.Partido(ut.CURRENT_MATCH_ID, self.division, self.temporada, jornada, matchDate, arbitroName, arbitroId,
                                                             localName, localGlobalId, localMarketValue, self.clasificacion[localGlobalId],
                                                             self.golesafavor[localGlobalId], self.golesencontra[localGlobalId],
