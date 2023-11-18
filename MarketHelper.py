@@ -15,8 +15,8 @@ class MarketHelper:
 
     def _init_singleton(self):
         self.firstMarketDate = datetime.now().date()
-        self.notInCorrectionTeams = set()
-        self.notInMarketTeams = set()
+        # self.notInCorrectionTeams = set()
+        # self.notInMarketTeams = set()
         self.MARKET_INFO = {}
         if ut.loadMarket:
             self._LOAD_MARKET_VALUES()
@@ -64,7 +64,7 @@ class MarketHelper:
 
 
         if equipoName not in ut.NAMES_TO_TRANSFERMARKT_NAMES:
-            self.notInCorrectionTeams.add(equipoName)
+            # self.notInCorrectionTeams.add(equipoName)
             equipoNames = equipoName
         else:
             equipoNames = ut.NAMES_TO_TRANSFERMARKT_NAMES[equipoName]
@@ -93,7 +93,7 @@ class MarketHelper:
             found_keys2 = [key for key in self.MARKET_INFO[backupDivision][realMarketDate].keys() if equipoName in key]
             
             if not found_keys and not found_keys2:
-                self.notInMarketTeams.add(equipoName)
+                # self.notInMarketTeams.add(equipoName)
                 return -1
             else:
                 if not found_keys:
@@ -113,10 +113,10 @@ class MarketHelper:
     def SAVE_MARKET_VALUES(self, path=ut.SAVE_MARKET_PATH):
         with open(path, 'wb') as file:
             pickle.dump(self.MARKET_INFO, file)
-        with open('uncorrectedMarketNames.txt', 'w', encoding='utf-8') as f:
-            f.write(f"{self.notInCorrectionTeams}")
-        with open('notInMarketNames.txt', 'w', encoding='utf-8') as f:
-            f.write(f"{self.notInMarketTeams}")
+        # with open('uncorrectedMarketNames.txt', 'w', encoding='utf-8') as f:
+        #     f.write(f"{self.notInCorrectionTeams}")
+        # with open('notInMarketNames.txt', 'w', encoding='utf-8') as f:
+        #     f.write(f"{self.notInMarketTeams}")
 
     def _LOAD_MARKET_VALUES(self, path=ut.SAVE_MARKET_PATH):
         if os.path.exists(path):

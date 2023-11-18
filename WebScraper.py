@@ -23,7 +23,7 @@ class WebScraper:
             mat = mat.replace('";', '')
             sp = mat.split('|')
             seasonTeamId = int(sp[0])
-            teamName = ut.GET_CORRECTED_TEAM_NAME(sp[1])
+            teamName = ut.GET_NORMALIZED_TEAM_NAME(sp[1])
             globalTeamId = ut.GET_GLOBAL_EQUIPO_ID(teamName)
             seasonIdToGlobalId[seasonTeamId] = globalTeamId
         return seasonIdToGlobalId

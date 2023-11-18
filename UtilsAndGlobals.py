@@ -31,6 +31,13 @@ def CHECK_KEY_EXISTANCE(key, collection, newElement):
     collection[key] = newElement() if callable(newElement) else newElement
     return False
 
+def GET_NORMALIZED_TEAM_NAME(equipo):
+    ut.RAISE_IF(equipo not in NAMES_CORRECTION, f"{equipo} no está en la corrección")
+    return NAMES_CORRECTION[equipo]
+
+def GET_TRANSFERMARKT_TEAM_NAMES(equipo):
+    equipoNames = ut.NAMES_TO_TRANSFERMARKT_NAMES[equipo]
+
 def GET_GLOBAL_EQUIPO_ID_FROM_TRANSFERMARKT_NAME(equipoName, alternateEquipoName):
     arrayPosibilidades = [equipoName, alternateEquipoName, TRANSFERMARKT_NAMES_TO_NORMAL.get(equipoName, None), TRANSFERMARKT_NAMES_TO_NORMAL.get(alternateEquipoName, None)]
     arrayIds = [GET_GLOBAL_EQUIPO_ID(element) for element in arrayPosibilidades if GET_GLOBAL_EQUIPO_ID(element, False) is not None]
@@ -61,10 +68,7 @@ def GET_GLOBAL_EQUIPO_ID(equipoName, alta=True):
         return CURRENT_TEAM_ID
     else:
         return None
-
-def GET_CORRECTED_TEAM_NAME(equipo):
-    ut.RAISE_IF(equipo not in NAMES_CORRECTION, f"{equipo} no está en la corrección")
-    return NAMES_CORRECTION[equipo]
+    
 
 def ADD_SEASON_INFO(division, temporada, seasonInfo):
     ut.CHECK_KEY_EXISTANCE(division, ALL_SEASONS_INFO, {})

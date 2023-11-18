@@ -24,7 +24,7 @@ class FileScraper:
         teamsNames = list({(d['localName'], d["localId"]) for d in self.data})
         for team in teamsNames:
             seasonTeamId = int(team[1])
-            teamName = ut.GET_CORRECTED_TEAM_NAME(team[0])
+            teamName = ut.GET_NORMALIZED_TEAM_NAME(team[0])
             globalTeamId = ut.GET_GLOBAL_EQUIPO_ID(teamName)
             seasonIdToGlobalId[seasonTeamId] = globalTeamId
         return seasonIdToGlobalId
